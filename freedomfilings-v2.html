@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreedomFilings — Post-Conviction Relief AI Assistant</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg:#02050c;--bg2:#050810;--bg3:#080d18;--bg4:#0c1220;
+  --gold:#c9a84c;--gold2:#e9c46a;--gold3:#ffd166;--gold4:rgba(201,168,76,0.12);
+  --dark:#1a1400;--cream:#f5f0e8;
+  --red:#8b1a1a;--red2:#c1121f;
+  --green:#1a4a3a;--green2:#2a9d8f;--green3:#52d9c9;
+  --white:#f0ece0;--gray:#4a4030;--light:#8a7a60;--lighter:#c8b898;
+  --border:rgba(201,168,76,0.1);--border2:rgba(201,168,76,0.18);
+  --shadow:0 24px 60px rgba(0,0,0,0.7);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:900;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(2,5,12,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.08em;color:var(--white);cursor:pointer;flex-shrink:0;}
+.logo em{color:var(--gold2);font-style:normal;}
+.nav-mid{display:flex;gap:2px;overflow-x:auto;}
+.ntab{padding:7px 13px;background:transparent;border:none;color:var(--light);font-family:'IBM Plex Sans',sans-serif;font-size:0.74rem;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;border-radius:5px;transition:all 0.18s;white-space:nowrap;}
+.ntab:hover{color:var(--white);background:rgba(201,168,76,0.06);}
+.ntab.on{color:var(--gold2);}
+.nav-right{display:flex;gap:8px;flex-shrink:0;}
+.nbtn{padding:7px 16px;border-radius:5px;font-family:'IBM Plex Sans',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.18s;border:none;}
+.nbtn.ghost{background:transparent;color:var(--lighter);border:1px solid var(--border2);}
+.nbtn.ghost:hover{border-color:var(--gold2);color:var(--gold2);}
+.nbtn.solid{background:var(--gold);color:#0a0800;}
+.nbtn.solid:hover{background:var(--gold2);}
+
+/* HERO */
+.hero{min-height:100vh;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 28px 60px;overflow:hidden;}
+.hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden;background:linear-gradient(160deg,#020508 0%,#05101a 60%,#080e18 100%);}
+.hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(2,5,12,0.3) 0%,rgba(2,5,12,0.6) 50%,rgba(2,5,12,1) 100%);z-index:1;}
+.hero-texture{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(201,168,76,0.015) 2px,rgba(201,168,76,0.015) 4px);z-index:2;}
+.hz{position:relative;z-index:3;}
+.hero-chip{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.28);padding:5px 16px;border-radius:100px;font-family:'IBM Plex Mono',monospace;font-size:0.67rem;color:var(--gold3);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:24px;animation:up 0.5s ease both;}
+.pulse{width:6px;height:6px;background:var(--gold2);border-radius:50%;animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+.hero-h{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,9vw,7.5rem);letter-spacing:0.04em;line-height:.9;margin-bottom:16px;animation:up 0.5s 0.08s ease both;}
+.hero-h em{color:var(--gold2);font-style:normal;display:block;}
+.hero-h small{display:block;font-size:28%;letter-spacing:0.22em;color:var(--lighter);margin-top:12px;font-family:'IBM Plex Mono',monospace;}
+.hero-p{font-family:'Libre Baskerville',serif;font-style:italic;font-size:1.05rem;color:var(--lighter);max-width:540px;margin:0 auto 34px;line-height:1.78;animation:up 0.5s 0.16s ease both;}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:up 0.5s 0.24s ease both;}
+.hbtn{padding:13px 34px;border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.22s;border:none;letter-spacing:0.02em;}
+.hbtn.gold{background:var(--gold);color:#0a0800;box-shadow:0 8px 28px rgba(201,168,76,0.3);}
+.hbtn.gold:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 14px 36px rgba(201,168,76,0.4);}
+.hbtn.out{background:transparent;color:var(--white);border:1.5px solid rgba(255,255,255,0.2);}
+.hbtn.out:hover{border-color:var(--gold2);color:var(--gold2);}
+@keyframes up{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* PHOTO STRIP */
+.strip{display:grid;grid-template-columns:repeat(4,1fr);height:200px;overflow:hidden;}
+.strip-img{position:relative;overflow:hidden;}
+.strip-img svg{transition:transform 0.4s;transform-origin:center;}
+.strip-img:hover svg{transform:scale(1.04);}
+.strip-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(2,5,12,0.85),transparent 60%);}
+.strip-lbl{position:absolute;bottom:10px;left:12px;z-index:2;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:rgba(255,255,255,0.75);letter-spacing:0.1em;text-transform:uppercase;}
+
+/* STATS */
+.statsbar{display:flex;justify-content:center;flex-wrap:wrap;background:rgba(201,168,76,0.05);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:24px 28px;}
+.si{padding:0 28px;text-align:center;border-right:1px solid rgba(201,168,76,0.1);}
+.si:last-child{border-right:none;}
+.sn{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--gold2);letter-spacing:0.05em;line-height:1;}
+.sl{font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:var(--light);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;}
+
+/* SECTIONS */
+.sec{padding:80px 32px;max-width:1320px;margin:0 auto;}
+.sec-full{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.sec-full-in{max-width:1320px;margin:0 auto;padding:80px 32px;}
+.stag{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--gold2);letter-spacing:0.22em;text-transform:uppercase;margin-bottom:8px;}
+.sh{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,3.8vw,3rem);letter-spacing:0.04em;line-height:1.02;}
+.sh em{color:var(--gold2);font-style:normal;}
+.sp{font-family:'Libre Baskerville',serif;font-style:italic;font-size:0.87rem;color:var(--light);line-height:1.72;max-width:460px;margin-top:10px;}
+.shdr{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:18px;margin-bottom:40px;}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:44px;}
+.step{background:rgba(201,168,76,0.04);border:1px solid var(--border);border-radius:12px;padding:24px;transition:all 0.2s;}
+.step:hover{border-color:var(--border2);background:rgba(201,168,76,0.07);}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:rgba(201,168,76,0.2);letter-spacing:0.05em;line-height:1;margin-bottom:10px;}
+.step-title{font-size:0.9rem;font-weight:700;margin-bottom:7px;color:var(--gold3);}
+.step-desc{font-size:0.8rem;color:var(--light);line-height:1.62;}
+
+/* DOCTRINES */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:44px;}
+.doc-card{background:rgba(201,168,76,0.03);border:1px solid var(--border);border-radius:11px;padding:22px;transition:all 0.2s;}
+.doc-card:hover{border-color:var(--border2);background:rgba(201,168,76,0.06);}
+.dc-cite{font-family:'IBM Plex Mono',monospace;font-size:0.64rem;color:var(--gold2);margin-bottom:6px;letter-spacing:0.04em;}
+.dc-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.04em;margin-bottom:8px;}
+.dc-desc{font-size:0.79rem;color:var(--lighter);line-height:1.62;margin-bottom:10px;}
+.dc-tip{background:rgba(201,168,76,0.06);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-family:'Libre Baskerville',serif;font-style:italic;font-size:0.76rem;color:var(--lighter);line-height:1.55;}
+
+/* TRANSCRIPTS */
+.trial-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:26px;}
+.tnbtn{padding:8px 18px;border-radius:6px;background:rgba(201,168,76,0.04);border:1px solid var(--border2);color:var(--lighter);font-family:'IBM Plex Sans',sans-serif;font-size:0.78rem;font-weight:500;cursor:pointer;transition:all 0.18s;}
+.tnbtn:hover{border-color:var(--gold2);color:var(--white);}
+.tnbtn.on{background:rgba(201,168,76,0.12);border-color:var(--gold2);color:var(--gold3);}
+.tpane{display:none;}
+.tpane.on{display:block;}
+.tr-wrap{background:#040609;border:1px solid var(--border);border-radius:13px;overflow:hidden;}
+.tr-hdr{background:rgba(201,168,76,0.07);border-bottom:1px solid var(--border);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.tr-htitle{font-family:'IBM Plex Mono',monospace;font-size:0.74rem;color:var(--gold3);letter-spacing:0.08em;}
+.tr-hmeta{font-family:'IBM Plex Mono',monospace;font-size:0.63rem;color:var(--light);}
+.tr-body{padding:24px 28px;max-height:560px;overflow-y:auto;font-family:'Libre Baskerville',serif;}
+.tr-body::-webkit-scrollbar{width:3px;}
+.tr-body::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.3);}
+.tline{margin-bottom:15px;line-height:1.7;}
+.tspk{font-family:'IBM Plex Mono',monospace;font-size:0.67rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;}
+.tspk.judge{color:#e9c46a;}.tspk.prose{color:#88aadd;}.tspk.def{color:#52d9c9;}.tspk.wit{color:#a8d5a2;}.tspk.clerk{color:#a0a8c0;}.tspk.app{color:#d4a0e8;}
+.ttxt{color:var(--cream);padding-left:13px;border-left:2px solid rgba(201,168,76,0.12);font-size:0.85rem;}
+.tnote{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.18);border-radius:5px;padding:8px 12px;margin:11px 0;font-size:0.76rem;color:var(--gold2);font-family:'IBM Plex Sans',sans-serif;font-style:italic;}
+.talert{background:rgba(139,26,26,0.1);border-left:3px solid var(--red2);padding:8px 12px;margin:10px 0;font-size:0.76rem;color:#ff9999;font-family:'IBM Plex Sans',sans-serif;}
+.talert strong{display:block;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;}
+
+/* MOCK TRIAL */
+.mock-wrap{background:#040609;border:1px solid var(--border);border-radius:13px;overflow:hidden;}
+.mock-hdr{background:rgba(201,168,76,0.07);border-bottom:1px solid var(--border);padding:13px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.mock-live{display:flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--gold3);letter-spacing:0.08em;}
+.mdot{width:7px;height:7px;background:var(--gold2);border-radius:50%;animation:blink 1.2s infinite;}
+.mock-stage{padding:20px 24px;border-bottom:1px solid var(--border);min-height:90px;}
+.mock-slbl{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--light);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:7px;}
+.mock-stxt{font-family:'Libre Baskerville',serif;font-size:0.88rem;color:var(--lighter);font-style:italic;line-height:1.65;}
+.mock-dlg{padding:20px 24px;max-height:270px;overflow-y:auto;display:flex;flex-direction:column;gap:11px;}
+.mock-dlg::-webkit-scrollbar{width:3px;}
+.mock-msg{padding:10px 13px;border-radius:8px;font-size:0.81rem;line-height:1.58;}
+.mock-msg.judge{background:rgba(233,196,106,0.07);border:1px solid rgba(233,196,106,0.16);color:#e9c46a;}
+.mock-msg.prose{background:rgba(136,170,221,0.07);border:1px solid rgba(136,170,221,0.16);color:#88aadd;}
+.mock-msg.def{background:rgba(82,217,201,0.07);border:1px solid rgba(82,217,201,0.16);color:#52d9c9;}
+.mock-msg.wit{background:rgba(168,213,162,0.07);border:1px solid rgba(168,213,162,0.16);color:#a8d5a2;}
+.mock-msg.app{background:rgba(212,160,232,0.07);border:1px solid rgba(212,160,232,0.16);color:#d4a0e8;}
+.mock-role{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;opacity:0.8;}
+.mock-ctrl{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
+.mock-sel{padding:7px 11px;background:rgba(255,255,255,0.05);border:1px solid var(--border2);border-radius:6px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:0.8rem;outline:none;cursor:pointer;}
+.mock-sel option{background:#040609;}
+.mbtn{padding:8px 18px;border-radius:6px;font-family:'IBM Plex Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.18s;border:none;}
+.mbtn.go{background:var(--gold);color:#0a0800;}
+.mbtn.go:hover{background:var(--gold2);}
+.mbtn.rst{background:rgba(255,255,255,0.05);color:var(--lighter);border:1px solid var(--border2);}
+.mbtn.rst:hover{color:var(--white);}
+.mtip{font-family:'Libre Baskerville',serif;font-style:italic;font-size:0.78rem;color:var(--light);margin-left:auto;}
+
+/* RESOURCES */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:44px;}
+.res-card{background:rgba(201,168,76,0.03);border:1px solid var(--border);border-radius:11px;padding:20px;}
+.rc-title{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:0.04em;margin-bottom:6px;color:var(--gold3);}
+.rc-phone{font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:var(--gold2);margin-bottom:5px;}
+.rc-desc{font-size:0.78rem;color:var(--light);line-height:1.58;}
+
+/* MAIN APP */
+#app{display:none;position:fixed;inset:0;z-index:4000;background:var(--bg);flex-direction:column;}
+#app.on{display:flex;}
+.app-nav{height:54px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
+.app-logo{font-family:'Bebas Neue',sans-serif;font-size:1.28rem;letter-spacing:0.07em;color:var(--white);}
+.app-logo em{color:var(--gold2);font-style:normal;}
+.app-body{display:flex;flex:1;overflow:hidden;}
+
+/* LEFT SIDEBAR */
+.app-left{width:240px;background:rgba(0,0,0,0.3);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;}
+.app-left::-webkit-scrollbar{width:2px;}
+.al-sec{padding:12px 13px 5px;font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:var(--light);text-transform:uppercase;letter-spacing:0.15em;}
+.al-btn{display:flex;align-items:center;gap:9px;padding:8px 13px;background:transparent;border:none;border-bottom:1px solid rgba(201,168,76,0.04);color:var(--lighter);font-family:'IBM Plex Sans',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.15s;text-align:left;width:100%;}
+.al-btn:hover,.al-btn.on{background:rgba(201,168,76,0.07);color:var(--white);}
+.al-btn.on{color:var(--gold3);}
+.al-icon{font-size:0.9rem;flex-shrink:0;}
+
+/* MAIN CHAT */
+.app-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.app-chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
+.app-chat::-webkit-scrollbar{width:3px;}
+.app-chat::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.28);}
+.amsg{display:flex;gap:10px;animation:up 0.28s ease;}
+.amsg.user{align-self:flex-end;flex-direction:row-reverse;max-width:700px;}
+.amsg.ai{max-width:780px;}
+.aav{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;}
+.aav.ai{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.24);color:var(--gold2);}
+.aav.usr{background:rgba(42,157,143,0.12);border:1px solid rgba(42,157,143,0.24);color:var(--green3);}
+.abub{padding:13px 16px;border-radius:12px;font-size:0.84rem;line-height:1.68;}
+.amsg.ai .abub{background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--cream);}
+.amsg.user .abub{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.18);color:var(--white);}
+.ameta{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--gold2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;}
+.tdots{display:flex;gap:4px;align-items:center;padding:3px 0;}
+.td{width:6px;height:6px;background:var(--gold2);border-radius:50%;opacity:0.4;animation:bounce 1.2s infinite;}
+.td:nth-child(2){animation-delay:0.2s;}.td:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:0.4;}40%{transform:translateY(-5px);opacity:1;}}
+
+/* INPUT */
+.app-inp{padding:13px 18px;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;}
+.inp-row{display:flex;gap:7px;align-items:flex-end;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:10px;padding:8px 12px;transition:border-color 0.2s;}
+.inp-row:focus-within{border-color:rgba(201,168,76,0.38);}
+.inp-ta{flex:1;background:transparent;border:none;color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:0.84rem;outline:none;resize:none;max-height:90px;min-height:20px;line-height:1.5;padding:2px 0;}
+.inp-ta::placeholder{color:#3a3020;}
+.inp-btns{display:flex;gap:5px;align-items:center;flex-shrink:0;}
+.ibtn{padding:6px 11px;border-radius:5px;font-family:'IBM Plex Sans',sans-serif;font-size:0.72rem;font-weight:600;cursor:pointer;transition:all 0.18s;border:none;}
+.ibtn.upload{background:rgba(255,255,255,0.06);color:var(--lighter);border:1px solid var(--border2);}
+.ibtn.upload:hover{color:var(--white);}
+.ibtn.send{background:var(--gold);color:#0a0800;width:32px;height:32px;padding:0;display:flex;align-items:center;justify-content:center;font-size:0.9rem;border-radius:7px;}
+.ibtn.send:hover{background:var(--gold2);}
+.inp-hint{font-family:'IBM Plex Mono',monospace;font-size:0.59rem;color:#3a3020;text-align:center;margin-top:6px;letter-spacing:0.06em;}
+
+/* RIGHT PANEL */
+.app-right{width:275px;background:rgba(0,0,0,0.18);border-left:1px solid var(--border);overflow-y:auto;flex-shrink:0;padding:13px;}
+.app-right::-webkit-scrollbar{width:3px;}
+.rphdr{font-family:'IBM Plex Mono',monospace;font-size:0.59rem;color:var(--light);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.rabtn{width:100%;padding:8px 12px;margin-bottom:6px;background:rgba(201,168,76,0.04);border:1px solid var(--border);border-radius:7px;color:var(--lighter);font-family:'IBM Plex Sans',sans-serif;font-size:0.76rem;cursor:pointer;transition:all 0.18s;text-align:left;display:flex;align-items:center;gap:8px;}
+.rabtn:hover{background:rgba(201,168,76,0.09);border-color:var(--border2);color:var(--white);}
+.disc-box{background:rgba(139,26,26,0.07);border:1px solid rgba(139,26,26,0.18);border-radius:7px;padding:10px 12px;font-size:0.72rem;color:#e89090;line-height:1.55;margin-bottom:11px;}
+.disc-box strong{color:#ffaaaa;}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.86);backdrop-filter:blur(8px);z-index:7000;align-items:center;justify-content:center;padding:16px;}
+.modal-bg.on{display:flex;}
+.modal{background:#06090f;border:1px solid var(--border2);border-radius:14px;padding:32px;max-width:540px;width:100%;position:relative;animation:up 0.28s ease;box-shadow:0 36px 90px rgba(0,0,0,0.7);max-height:90vh;overflow-y:auto;}
+.modal::-webkit-scrollbar{width:3px;}
+.modal h2{font-family:'Bebas Neue',sans-serif;font-size:1.85rem;letter-spacing:0.04em;margin-bottom:5px;}
+.modal h2 em{color:var(--gold2);font-style:normal;}
+.modal p{font-size:0.82rem;color:var(--light);margin-bottom:20px;line-height:1.6;}
+.mclose{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--light);font-size:1.3rem;cursor:pointer;padding:4px 8px;}
+.mclose:hover{color:var(--white);}
+.frow{margin-bottom:13px;}
+.frow label{display:block;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--light);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:5px;}
+.frow input,.frow select,.frow textarea{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:7px;padding:10px 12px;color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:0.84rem;outline:none;transition:border-color 0.18s;}
+.frow input:focus,.frow select:focus,.frow textarea:focus{border-color:rgba(201,168,76,0.4);}
+.frow input::placeholder,.frow textarea::placeholder{color:#2a2010;}
+.frow select option{background:#06090f;}
+.frow textarea{resize:vertical;min-height:65px;}
+.ftag{background:rgba(42,157,143,0.12);border:1px solid rgba(42,157,143,0.26);color:#52d9c9;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;padding:3px 10px;border-radius:100px;letter-spacing:0.1em;}
+
+/* FOOTER */
+footer{background:#010306;border-top:1px solid var(--border);padding:52px 32px 26px;}
+.ft-in{max-width:1320px;margin:0 auto;}
+.ft-grid{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:52px;margin-bottom:40px;}
+.ft-brand{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.07em;margin-bottom:10px;}
+.ft-brand em{color:var(--gold2);font-style:normal;}
+.ft-desc{font-size:0.78rem;color:var(--light);line-height:1.68;max-width:250px;}
+.ft-col h4{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--gold2);text-transform:uppercase;letter-spacing:0.18em;margin-bottom:13px;}
+.ft-col a{display:block;font-size:0.78rem;color:var(--light);text-decoration:none;margin-bottom:9px;cursor:pointer;transition:color 0.18s;}
+.ft-col a:hover{color:var(--white);}
+.ft-btm{border-top:1px solid var(--border);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.ft-btm p{font-size:0.7rem;color:var(--gray);}
+
+@media(max-width:900px){.app-right{display:none;}.ft-grid{grid-template-columns:1fr 1fr;gap:26px;}}
+@media(max-width:640px){nav{padding:0 12px;}.nav-mid{display:none;}.sec{padding:56px 16px;}.sec-full-in{padding:56px 16px;}.si{padding:0 14px;}.strip{grid-template-columns:1fr 1fr;height:280px;}.app-left{display:none;}.ft-grid{grid-template-columns:1fr;gap:20px;}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo" onclick="scrollTo('hero')">FREEDOM<em>FILINGS</em></div>
+  <div class="nav-mid">
+    <button class="ntab on" onclick="navTo(this,'how-sec')">How It Works</button>
+    <button class="ntab" onclick="navTo(this,'doctrine-sec')">Legal Doctrines</button>
+    <button class="ntab" onclick="navTo(this,'transcript-sec')">Court Transcripts</button>
+    <button class="ntab" onclick="navTo(this,'mock-sec')">Mock Hearings</button>
+    <button class="ntab" onclick="navTo(this,'resources-sec')">Resources</button>
+  </div>
+  <div class="nav-right">
+    <button class="nbtn ghost" onclick="openM('start-modal')">Get Started</button>
+    <button class="nbtn solid" onclick="openApp()">Open AI Assistant ↗</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="hero">
+  <div class="hero-photo">
+<svg viewBox="0 0 1200 580" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.22;">
+  <defs>
+    <linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1828"/><stop offset="100%" stop-color="#0d1f30"/></linearGradient>
+  </defs>
+  <rect width="1200" height="580" fill="url(#hsky)"/>
+  <circle cx="100" cy="80" r="1.2" fill="#c9a84c" opacity="0.7"/><circle cx="280" cy="45" r="1" fill="#c9a84c" opacity="0.5"/><circle cx="450" cy="90" r="1.5" fill="#c9a84c" opacity="0.4"/><circle cx="620" cy="32" r="1" fill="#c9a84c" opacity="0.7"/><circle cx="820" cy="58" r="1.2" fill="#c9a84c" opacity="0.5"/><circle cx="1020" cy="42" r="1" fill="#c9a84c" opacity="0.6"/><circle cx="1160" cy="88" r="1.5" fill="#c9a84c" opacity="0.4"/>
+  <rect x="0" y="500" width="1200" height="80" fill="#030810" opacity="0.95"/>
+  <rect x="200" y="472" width="800" height="30" fill="#0a1422" opacity="0.9"/>
+  <rect x="230" y="456" width="740" height="18" fill="#0c1828" opacity="0.9"/>
+  <rect x="260" y="443" width="680" height="16" fill="#0e1c2e" opacity="0.9"/>
+  <rect x="290" y="185" width="620" height="260" fill="#071220" opacity="0.95"/>
+  <rect x="310" y="148" width="28" height="295" fill="#0c1d30" opacity="0.9"/>
+  <rect x="397" y="148" width="28" height="295" fill="#0c1d30" opacity="0.9"/>
+  <rect x="484" y="148" width="28" height="295" fill="#0c1d30" opacity="0.9"/>
+  <rect x="571" y="148" width="28" height="295" fill="#0c1d30" opacity="0.9"/>
+  <rect x="658" y="148" width="28" height="295" fill="#0c1d30" opacity="0.9"/>
+  <rect x="745" y="148" width="28" height="295" fill="#0c1d30" opacity="0.9"/>
+  <rect x="832" y="148" width="28" height="295" fill="#0c1d30" opacity="0.9"/>
+  <rect x="300" y="135" width="600" height="16" fill="#c9a84c" opacity="0.28"/>
+  <polygon points="600,52 960,135 240,135" fill="#091526" opacity="0.95"/>
+  <rect x="200" y="132" width="800" height="6" fill="#c9a84c" opacity="0.22"/>
+  <rect x="543" y="345" width="114" height="100" rx="3" fill="#030a14" opacity="0.95"/>
+  <path d="M543 345 Q600 308 657 345" fill="#c9a84c" opacity="0.08"/>
+  <rect x="330" y="265" width="70" height="80" rx="3" fill="#030a14" opacity="0.9"/>
+  <rect x="800" y="265" width="70" height="80" rx="3" fill="#030a14" opacity="0.9"/>
+  <line x1="600" y1="18" x2="600" y2="60" stroke="#c9a84c" stroke-width="1.5" opacity="0.35"/>
+  <ellipse cx="148" cy="425" rx="75" ry="105" fill="#020710" opacity="0.85"/>
+  <rect x="142" y="472" width="12" height="28" fill="#020710" opacity="0.9"/>
+  <ellipse cx="1052" cy="425" rx="75" ry="105" fill="#020710" opacity="0.85"/>
+  <rect x="1046" y="472" width="12" height="28" fill="#020710" opacity="0.9"/>
+  <line x1="400" y1="445" x2="400" y2="500" stroke="#c9a84c" stroke-width="2" opacity="0.28"/>
+  <circle cx="400" cy="442" r="5" fill="#c9a84c" opacity="0.35"/>
+  <line x1="800" y1="445" x2="800" y2="500" stroke="#c9a84c" stroke-width="2" opacity="0.28"/>
+  <circle cx="800" cy="442" r="5" fill="#c9a84c" opacity="0.35"/>
+</svg>
+</div>
+  <div class="hero-grad"></div>
+  <div class="hero-texture"></div>
+  <div class="hz">
+    <div class="hero-chip"><span class="pulse"></span>Free Beta · SC & All 50 States · Real Case Law</div>
+    <h1 class="hero-h">FREEDOM<em>FILINGS</em><small>Post-Conviction Relief AI — Built for Families</small></h1>
+    <p class="hero-p">Upload your documents. Describe the case. The AI builds every constitutional argument, generates complete ready-to-file documents, and prepares you for what happens in court.</p>
+    <div class="hero-btns">
+      <button class="hbtn gold" onclick="openApp()">Launch Free AI Assistant</button>
+      <button class="hbtn out" onclick="scrollTo('transcript-sec')">Study Court Transcripts</button>
+    </div>
+  </div>
+</div>
+
+<!-- PHOTO STRIP -->
+<div class="strip">
+  <div class="strip-img">
+    <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;background:#04080f;">
+  <rect x="30" y="140" width="340" height="80" fill="#060c16"/>
+  <rect x="40" y="35" width="320" height="130" fill="#060e1a"/>
+  <rect x="30" y="22" width="340" height="16" fill="#c9a84c" opacity="0.28"/>
+  <polygon points="200,4 370,22 30,22" fill="#060e1a" stroke="#c9a84c" stroke-width="0.5" stroke-opacity="0.18"/>
+  <rect x="55" y="36" width="18" height="134" fill="#081422"/>
+  <rect x="103" y="36" width="18" height="134" fill="#081422"/>
+  <rect x="151" y="36" width="18" height="134" fill="#081422"/>
+  <rect x="199" y="36" width="18" height="134" fill="#081422"/>
+  <rect x="247" y="36" width="18" height="134" fill="#081422"/>
+  <rect x="295" y="36" width="18" height="134" fill="#081422"/>
+  <rect x="343" y="36" width="18" height="134" fill="#081422"/>
+  <rect x="158" y="122" width="84" height="50" fill="#030810"/>
+  <rect x="40" y="168" width="320" height="12" fill="#c9a84c" opacity="0.13"/>
+</svg>
+    <div class="strip-lbl">Federal Courthouse</div>
+  </div>
+  <div class="strip-img">
+    <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;background:#04080f;">
+  <rect x="60" y="182" width="280" height="10" rx="2" fill="#1a0a04" opacity="0.9"/>
+  <rect x="80" y="156" width="240" height="28" rx="3" fill="#6b1414"/>
+  <rect x="80" y="156" width="8" height="28" fill="#c13a3a" opacity="0.7"/>
+  <text x="200" y="175" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#f5d090" opacity="0.75">CRIMINAL PROCEDURE</text>
+  <rect x="90" y="122" width="220" height="36" rx="3" fill="#143a14"/>
+  <rect x="90" y="122" width="8" height="36" fill="#3a9a3a" opacity="0.6"/>
+  <text x="200" y="144" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#90e090" opacity="0.75">CONSTITUTIONAL LAW</text>
+  <rect x="70" y="84" width="260" height="40" rx="3" fill="#14144a"/>
+  <rect x="70" y="84" width="8" height="40" fill="#4a4acf" opacity="0.6"/>
+  <text x="200" y="108" text-anchor="middle" font-family="Georgia,serif" font-size="8.5" fill="#9090ff" opacity="0.75">FEDERAL HABEAS CORPUS</text>
+  <rect x="85" y="46" width="230" height="40" rx="3" fill="#2e2008"/>
+  <rect x="85" y="46" width="8" height="40" fill="#c9a84c" opacity="0.8"/>
+  <text x="200" y="70" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#e9c46a" opacity="0.85">POST-CONVICTION RELIEF</text>
+  <rect x="105" y="14" width="190" height="34" rx="3" fill="#201408"/>
+  <rect x="105" y="14" width="8" height="34" fill="#9a7030" opacity="0.7"/>
+  <text x="200" y="35" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#c9a84c" opacity="0.75">U.S. SUPREME COURT</text>
+</svg>
+    <div class="strip-lbl">Case Law Library</div>
+  </div>
+  <div class="strip-img">
+    <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;background:#04080f;">
+  <rect x="105" y="28" width="225" height="168" rx="4" fill="#060e1a" stroke="#c9a84c" stroke-width="0.4" stroke-opacity="0.18"/>
+  <rect x="80" y="18" width="225" height="168" rx="4" fill="#070f1c" stroke="#c9a84c" stroke-width="0.7" stroke-opacity="0.28"/>
+  <rect x="80" y="18" width="225" height="22" rx="4" fill="#0a1828"/>
+  <rect x="80" y="32" width="225" height="8" fill="#0a1828"/>
+  <text x="192" y="33" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" fill="#c9a84c" opacity="0.8">POST-CONVICTION RELIEF</text>
+  <text x="192" y="58" text-anchor="middle" font-family="Georgia,serif" font-size="6.5" fill="#8a9ab8" opacity="0.65">IN THE COURT OF COMMON PLEAS</text>
+  <text x="192" y="72" text-anchor="middle" font-family="Courier,monospace" font-size="6.5" fill="#c9a84c" opacity="0.45">CASE NO. 20XX-GS-XX-XXXX</text>
+  <rect x="96" y="84" width="192" height="2" rx="1" fill="#c9a84c" opacity="0.14"/>
+  <rect x="96" y="93" width="180" height="2" rx="1" fill="#8a9ab8" opacity="0.1"/>
+  <rect x="96" y="102" width="186" height="2" rx="1" fill="#8a9ab8" opacity="0.1"/>
+  <rect x="96" y="111" width="162" height="2" rx="1" fill="#8a9ab8" opacity="0.09"/>
+  <rect x="96" y="124" width="188" height="2" rx="1" fill="#8a9ab8" opacity="0.1"/>
+  <rect x="96" y="133" width="172" height="2" rx="1" fill="#8a9ab8" opacity="0.09"/>
+  <rect x="96" y="142" width="180" height="2" rx="1" fill="#8a9ab8" opacity="0.09"/>
+  <rect x="96" y="155" width="130" height="2" rx="1" fill="#8a9ab8" opacity="0.08"/>
+  <rect x="96" y="166" width="96" height="1" fill="#c9a84c" opacity="0.22"/>
+  <text x="144" y="176" text-anchor="middle" font-family="Georgia,serif" font-size="5.5" fill="#c9a84c" opacity="0.38">Petitioner Signature</text>
+  <circle cx="258" cy="168" r="13" fill="none" stroke="#c9a84c" stroke-width="0.8" stroke-opacity="0.18"/>
+  <text x="258" y="171" text-anchor="middle" font-family="Georgia,serif" font-size="5" fill="#c9a84c" opacity="0.28">SEAL</text>
+</svg>
+    <div class="strip-lbl">Court Documents</div>
+  </div>
+  <div class="strip-img">
+    <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;background:#04080f;">
+  <text x="40" y="55" font-family="Georgia,serif" font-size="32" fill="#c9a84c" opacity="0.05">§</text>
+  <text x="310" y="200" font-family="Georgia,serif" font-size="32" fill="#c9a84c" opacity="0.05">§</text>
+  <line x1="200" y1="28" x2="200" y2="158" stroke="#c9a84c" stroke-width="2.5" opacity="0.45"/>
+  <polygon points="200,16 208,28 192,28" fill="#c9a84c" opacity="0.45"/>
+  <line x1="96" y1="72" x2="304" y2="72" stroke="#c9a84c" stroke-width="2" opacity="0.42"/>
+  <line x1="116" y1="72" x2="116" y2="108" stroke="#c9a84c" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.32"/>
+  <path d="M86,108 Q116,124 146,108" fill="none" stroke="#c9a84c" stroke-width="1.8" opacity="0.42"/>
+  <line x1="284" y1="72" x2="284" y2="120" stroke="#c9a84c" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.32"/>
+  <path d="M254,120 Q284,136 314,120" fill="none" stroke="#c9a84c" stroke-width="1.8" opacity="0.42"/>
+  <rect x="98" y="104" width="36" height="4" rx="2" fill="#c9a84c" opacity="0.22"/>
+  <rect x="266" y="116" width="36" height="4" rx="2" fill="#c9a84c" opacity="0.22"/>
+  <rect x="186" y="156" width="28" height="6" rx="2" fill="#c9a84c" opacity="0.28"/>
+  <rect x="172" y="161" width="56" height="4" rx="2" fill="#c9a84c" opacity="0.18"/>
+  <text x="200" y="190" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" fill="#c9a84c" opacity="0.35" letter-spacing="2.5">EQUAL JUSTICE UNDER LAW</text>
+</svg>
+    <div class="strip-lbl">Filing Preparation</div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="statsbar">
+  <div class="si"><div class="sn">2.1M</div><div class="sl">Incarcerated in US</div></div>
+  <div class="si"><div class="sn">97%</div><div class="sl">Never Go to Trial</div></div>
+  <div class="si"><div class="sn">3,200+</div><div class="sl">Exonerations Since 1989</div></div>
+  <div class="si"><div class="sn">46%</div><div class="sl">Never File PCR</div></div>
+  <div class="si"><div class="sn">15+</div><div class="sl">Filing Types Generated</div></div>
+  <div class="si"><div class="sn">$0</div><div class="sl">Cost During Beta</div></div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="sec" id="how-sec">
+  <div class="shdr">
+    <div>
+      <div class="stag">// How It Works</div>
+      <h2 class="sh">Eight Steps to <em>Every Argument</em></h2>
+      <p class="sp">The same process a well-funded defense team would use — available free to every family.</p>
+    </div>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="step-num">01</div><div class="step-title">Read Everything First</div><div class="step-desc">Every document you upload is fully read before the AI responds. Police reports, plea transcripts, PCR orders, attorney letters — everything is analyzed for legally significant details, dates, contradictions.</div></div>
+    <div class="step"><div class="step-num">02</div><div class="step-title">Build the Timeline</div><div class="step-desc">A complete chronological timeline is constructed from earliest event to today. Every date matters — filing deadlines, statute of limitations, AEDPA clock — all calculated from your facts.</div></div>
+    <div class="step"><div class="step-num">03</div><div class="step-title">Catalog Attorney Failures</div><div class="step-desc">Every attorney who touched the case is identified. Every failure — failure to investigate, failure to file, failure to advise, conflict of interest — is cataloged for the Strickland analysis.</div></div>
+    <div class="step"><div class="step-num">04</div><div class="step-title">Find Unused Evidence</div><div class="step-desc">Witnesses never called. Evidence never requested. Expert testimony never retained. Police reports never obtained. Every piece of available-but-unused evidence is identified.</div></div>
+    <div class="step"><div class="step-num">05</div><div class="step-title">Map Facts to Law</div><div class="step-desc">Every fact is matched to every applicable constitutional doctrine — IAC, Brady, Napue, Boykin, Martinez, actual innocence, Batson, Ramos, Ake, Dusky, and more.</div></div>
+    <div class="step"><div class="step-num">06</div><div class="step-title">Draft the Arguments</div><div class="step-desc">Complete filing language is generated for every viable claim — the strongest possible version, with real case citations, factual allegations, and legal standards applied to your specific facts.</div></div>
+    <div class="step"><div class="step-num">07</div><div class="step-title">Build the Rebuttals</div><div class="step-desc">Every State counterargument is anticipated and addressed inside the filing. Procedural default, AEDPA deference, strategic decision — all rebutted before the State even raises them.</div></div>
+    <div class="step"><div class="step-num">08</div><div class="step-title">Action Plan with Deadlines</div><div class="step-desc">Plain-language instructions: what to file, where to file it, when the deadline is, what address to use, what order to file in. Every step laid out so nothing is missed.</div></div>
+  </div>
+</div>
+
+<!-- LEGAL DOCTRINES -->
+<div class="sec-full" id="doctrine-sec">
+  <div class="sec-full-in">
+    <div class="shdr">
+      <div>
+        <div class="stag">// Constitutional Law</div>
+        <h2 class="sh">Every Ground for <em>Relief</em></h2>
+        <p class="sp">Applies to any criminal case — murder, drugs, robbery, assault, sex offenses, DUI, federal charges, juvenile cases.</p>
+      </div>
+    </div>
+    <div class="doc-grid" id="doc-grid"></div>
+  </div>
+</div>
+
+<!-- TRANSCRIPTS -->
+<div class="sec" id="transcript-sec">
+  <div class="shdr">
+    <div>
+      <div class="stag">// Real Court Proceedings</div>
+      <h2 class="sh">Study the <em>Transcripts</em></h2>
+      <p class="sp">Read real courtroom language. Understand every stage before you get there. Know what to listen for and what questions matter.</p>
+    </div>
+  </div>
+  <div class="trial-nav">
+    <button class="tnbtn on" onclick="showT(this,'tp-pcr')">PCR Hearing</button>
+    <button class="tnbtn" onclick="showT(this,'tp-plea')">Guilty Plea Colloquy</button>
+    <button class="tnbtn" onclick="showT(this,'tp-sentencing')">Sentencing</button>
+    <button class="tnbtn" onclick="showT(this,'tp-habeas')">Federal Habeas</button>
+    <button class="tnbtn" onclick="showT(this,'tp-suppress')">Suppression Hearing</button>
+    <button class="tnbtn" onclick="showT(this,'tp-appeal')">Direct Appeal</button>
+    <button class="tnbtn" onclick="showT(this,'tp-competency')">Competency</button>
+    <button class="tnbtn" onclick="showT(this,'tp-brady')">Brady Hearing</button>
+  </div>
+  <div id="tp-pcr" class="tpane on"></div>
+  <div id="tp-plea" class="tpane"></div>
+  <div id="tp-sentencing" class="tpane"></div>
+  <div id="tp-habeas" class="tpane"></div>
+  <div id="tp-suppress" class="tpane"></div>
+  <div id="tp-appeal" class="tpane"></div>
+  <div id="tp-competency" class="tpane"></div>
+  <div id="tp-brady" class="tpane"></div>
+</div>
+
+<!-- MOCK HEARINGS -->
+<div class="sec-full" id="mock-sec">
+  <div class="sec-full-in">
+    <div class="shdr">
+      <div>
+        <div class="stag">// Interactive Simulation</div>
+        <h2 class="sh">Mock Hearing <em>Simulator</em></h2>
+        <p class="sp">Step through real hearing scenarios before your day in court. See exactly what each participant says and why it matters.</p>
+      </div>
+    </div>
+    <div class="mock-wrap">
+      <div class="mock-hdr">
+        <div class="mock-live"><span class="mdot"></span>SIMULATION MODE</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;color:var(--light)" id="mock-stage-lbl">Select a scenario below</div>
+      </div>
+      <div class="mock-stage"><div class="mock-slbl">Current Stage</div><div class="mock-stxt" id="mock-scene">Choose a hearing type and click Run Simulation. Each simulation walks you through the exact procedural sequence, step by step, with annotations explaining what each exchange means for your case.</div></div>
+      <div class="mock-dlg" id="mock-dlg"></div>
+      <div class="mock-ctrl">
+        <select class="mock-sel" id="mock-sel">
+          <option value="">— Choose Hearing Type —</option>
+          <option value="pcr_opening">PCR Hearing — Opening</option>
+          <option value="pcr_iac">PCR — IAC Cross-Exam of Trial Counsel</option>
+          <option value="plea">Guilty Plea Colloquy</option>
+          <option value="sentencing">Sentencing — Mitigation Argument</option>
+          <option value="habeas">Federal Habeas Argument</option>
+          <option value="suppress">Motion to Suppress — 4th Amendment</option>
+          <option value="brady">Brady Evidence Hearing</option>
+          <option value="batson">Batson Challenge — Jury Selection</option>
+          <option value="competency">Competency Evaluation</option>
+          <option value="voir_dire">Voir Dire — Juror Questioning</option>
+        </select>
+        <button class="mbtn go" onclick="runMock()">▶ Run Simulation</button>
+        <button class="mbtn rst" onclick="resetMock()">↺ Reset</button>
+        <div class="mtip" id="mock-tip">Select a scenario to begin</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESOURCES -->
+<div class="sec" id="resources-sec">
+  <div class="shdr">
+    <div>
+      <div class="stag">// Legal Resources</div>
+      <h2 class="sh">Organizations That <em>Fight for You</em></h2>
+      <p class="sp">Free legal representation and advocacy. Contact these organizations about your case.</p>
+    </div>
+  </div>
+  <div class="res-grid">
+    <div class="res-card"><div class="rc-title">SC Innocence Project</div><div class="rc-phone">(803) 777-1646</div><div class="rc-desc">University of South Carolina School of Law. Investigates wrongful convictions in SC. Accepts applications from incarcerated individuals and families.</div></div>
+    <div class="res-card"><div class="rc-title">SC Appleseed Legal Justice</div><div class="rc-phone">(803) 779-1113</div><div class="rc-desc">Advocates for low-income South Carolinians. Criminal justice reform, PCR assistance, systemic advocacy.</div></div>
+    <div class="res-card"><div class="rc-title">SC Legal Services</div><div class="rc-phone">1-888-346-5592</div><div class="rc-desc">Free civil legal help for low-income South Carolinians. Can assist with collateral consequences of conviction and family matters.</div></div>
+    <div class="res-card"><div class="rc-title">Innocence Project (National)</div><div class="rc-phone">(212) 364-5340</div><div class="rc-desc">Pioneered DNA exoneration. Takes cases nationwide where DNA testing can prove innocence. 200+ exonerations.</div></div>
+    <div class="res-card"><div class="rc-title">Equal Justice Initiative</div><div class="rc-phone">(334) 269-1803</div><div class="rc-desc">Bryan Stevenson's organization (Just Mercy). Represents people on death row and those wrongly convicted. Montgomery, AL.</div></div>
+    <div class="res-card"><div class="rc-title">ACLU National</div><div class="rc-phone">(212) 549-2500</div><div class="rc-desc">Civil liberties organization with active criminal justice project. Takes cases with broad constitutional significance.</div></div>
+    <div class="res-card"><div class="rc-title">NACDL</div><div class="rc-phone">(202) 872-8600</div><div class="rc-desc">National Association of Criminal Defense Lawyers. Can provide referrals to criminal defense attorneys in your area.</div></div>
+    <div class="res-card"><div class="rc-title">The Sentencing Project</div><div class="rc-phone">sentencingproject.org</div><div class="rc-desc">Research and advocacy on mass incarceration, racial disparities, and sentencing reform. Produces state-by-state data.</div></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-in">
+    <div class="ft-grid">
+      <div>
+        <div class="ft-brand">FREEDOM<em>FILINGS</em></div>
+        <p class="ft-desc">Post-conviction relief AI for incarcerated individuals and their families. Not a law firm. Not legal advice. A tool built for justice.</p>
+      </div>
+      <div class="ft-col">
+        <h4>South Carolina</h4>
+        <a>SC Innocence Project: (803) 777-1646</a>
+        <a>SC Appleseed: (803) 779-1113</a>
+        <a>SC Legal Services: 1-888-346-5592</a>
+        <a>SC Public Defender: scpd.sc.gov</a>
+      </div>
+      <div class="ft-col">
+        <h4>National</h4>
+        <a>Innocence Project: (212) 364-5340</a>
+        <a>ACLU: (212) 549-2500</a>
+        <a>Equal Justice Initiative: (334) 269-1803</a>
+        <a>NACDL: (202) 872-8600</a>
+      </div>
+      <div class="ft-col">
+        <h4>Platform</h4>
+        <a onclick="openApp()">Launch AI Assistant</a>
+        <a onclick="scrollTo('transcript-sec')">Court Transcripts</a>
+        <a onclick="scrollTo('mock-sec')">Mock Hearings</a>
+        <a onclick="scrollTo('doctrine-sec')">Legal Doctrines</a>
+        <a onclick="openM('start-modal')">Get Started Free</a>
+      </div>
+    </div>
+    <div class="ft-btm">
+      <p>© 2025 FreedomFilings. Not a law firm. Nothing here is legal advice. Always seek licensed legal representation. Free during beta.</p>
+      <span class="ftag">● Free Beta</span>
+    </div>
+  </div>
+</footer>
+
+<!-- GET STARTED MODAL -->
+<div class="modal-bg" id="start-modal">
+  <div class="modal">
+    <button class="mclose" onclick="closeM('start-modal')">✕</button>
+    <h2>GET <em>STARTED</em></h2>
+    <p>Provide what you have. You can start with partial information — we build as we go.</p>
+    <div class="frow"><label>Person's Full Name</label><input type="text" placeholder="Exactly as it appears on court documents"/></div>
+    <div class="frow"><label>Inmate / Case Number</label><input type="text" placeholder="SCDC number or case number"/></div>
+    <div class="frow"><label>State of Conviction</label>
+      <select id="modal-state">
+        <option value="">Select state...</option>
+      </select>
+    </div>
+    <div class="frow"><label>Charge & Year</label><input type="text" placeholder="e.g. Murder, 2019"/></div>
+    <div class="frow"><label>Your Email (optional — for follow-up)</label><input type="email" placeholder="your@email.com"/></div>
+    <div class="frow"><label>What went wrong (briefly)</label><textarea placeholder="Describe attorney failures, missing evidence, plea issues, or any other concerns..."></textarea></div>
+    <button class="hbtn gold" style="width:100%;margin-top:6px" onclick="closeM('start-modal');openApp()">Open AI Assistant & Begin →</button>
+  </div>
+</div>
+
+<!-- FULL AI APP -->
+<div id="app">
+  <div class="app-nav">
+    <div class="app-logo">FREEDOM<em>FILINGS</em> <span style="font-size:0.75rem;font-family:'IBM Plex Mono',monospace;color:var(--light);margin-left:8px;">AI Legal Assistant</span></div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span class="ftag">● Free Beta</span>
+      <button class="nbtn ghost" onclick="closeApp()">← Back</button>
+    </div>
+  </div>
+  <div class="app-body">
+    <!-- LEFT SIDEBAR -->
+    <div class="app-left">
+      <div class="al-sec">Generate Filings</div>
+      <button class="al-btn" onclick="gen('habeas')"><span class="al-icon">🏛</span>Federal § 2254 Habeas</button>
+      <button class="al-btn" onclick="gen('pcr')"><span class="al-icon">📋</span>State PCR Application</button>
+      <button class="al-btn" onclick="gen('brady')"><span class="al-icon">🔍</span>Brady / FOIA Request</button>
+      <button class="al-btn" onclick="gen('iac')"><span class="al-icon">⚖️</span>Strickland IAC Analysis</button>
+      <button class="al-btn" onclick="gen('boykin')"><span class="al-icon">📝</span>Involuntary Plea Motion</button>
+      <button class="al-btn" onclick="gen('martinez')"><span class="al-icon">🔗</span>Martinez Cause & Prejudice</button>
+      <button class="al-btn" onclick="gen('actual')"><span class="al-icon">🔓</span>Actual Innocence Gateway</button>
+      <button class="al-btn" onclick="gen('batson')"><span class="al-icon">👥</span>Batson Jury Discrimination</button>
+      <button class="al-btn" onclick="gen('competency')"><span class="al-icon">🧠</span>Competency Claim</button>
+      <button class="al-btn" onclick="gen('ramos')"><span class="al-icon">⚡</span>Non-Unanimous Jury (Ramos)</button>
+      <button class="al-btn" onclick="gen('miller')"><span class="al-icon">👦</span>Juvenile LWOP (Miller)</button>
+      <button class="al-btn" onclick="gen('affidavit')"><span class="al-icon">✍️</span>Witness Affidavit</button>
+      <button class="al-btn" onclick="gen('ifp')"><span class="al-icon">💳</span>IFP Fee Waiver</button>
+      <button class="al-btn" onclick="gen('innocence-letter')"><span class="al-icon">✉️</span>Innocence Org Letter</button>
+      <button class="al-btn" onclick="gen('timeline')"><span class="al-icon">📅</span>Chronological Timeline</button>
+      <button class="al-btn" onclick="gen('actionplan')"><span class="al-icon">📌</span>Deadline Action Plan</button>
+      <div class="al-sec" style="margin-top:8px;">Study Tools</div>
+      <button class="al-btn" onclick="closeApp();scrollTo('transcript-sec')"><span class="al-icon">📖</span>Court Transcripts</button>
+      <button class="al-btn" onclick="closeApp();scrollTo('mock-sec')"><span class="al-icon">🎭</span>Mock Hearings</button>
+      <button class="al-btn" onclick="closeApp();scrollTo('doctrine-sec')"><span class="al-icon">⚖️</span>Legal Doctrines</button>
+      <button class="al-btn" onclick="closeApp();scrollTo('resources-sec')"><span class="al-icon">📞</span>Resources & Hotlines</button>
+    </div>
+
+    <!-- MAIN CHAT -->
+    <div class="app-main">
+      <div class="app-chat" id="app-msgs">
+        <div class="disc-box"><strong>NOTICE:</strong> FreedomFilings AI is not a licensed attorney. Nothing here is legal advice. Always seek licensed representation: SC Innocence Project (803) 777-1646 · ACLU (212) 549-2500 · Equal Justice Initiative (334) 269-1803</div>
+        <div class="amsg ai">
+          <div class="aav ai">FF</div>
+          <div class="abub">
+            <div class="ameta">FreedomFilings AI — All 50 States</div>
+            Welcome. I work through every post-conviction case using an eight-step process — the same approach a well-funded defense team would use.<br><br>
+            I handle <strong>any criminal case</strong>: murder, assault, drugs, robbery, sex offenses, DUI, federal charges, juvenile cases — any charge, any court, any state.<br><br>
+            To get started, tell me:<br>
+            <strong>1.</strong> Person's full name and case/inmate number<br>
+            <strong>2.</strong> Charge, conviction date, county, judge, sentence<br>
+            <strong>3.</strong> Every attorney who handled the case (trial, appeal, PCR)<br>
+            <strong>4.</strong> Current stage: trial / plea / direct appeal / PCR / federal habeas<br>
+            <strong>5.</strong> What went wrong — in your own words<br><br>
+            Upload photos of documents using the 📎 button. Paste transcript text directly into the chat. I read everything before responding.
+          </div>
+        </div>
+      </div>
+      <div class="app-inp">
+        <div class="inp-row">
+          <textarea class="inp-ta" id="app-ta" rows="1" placeholder="Describe the case, paste document text, or ask anything..." onkeydown="appKey(event)" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
+          <div class="inp-btns">
+            <button class="ibtn upload" onclick="document.getElementById('file-in').click()">📎 Upload</button>
+            <input type="file" id="file-in" accept="image/*,.pdf,.txt,.docx" multiple style="display:none" onchange="handleUpload(this)"/>
+            <button class="ibtn send" onclick="appSend()">→</button>
+          </div>
+        </div>
+        <div class="inp-hint">ENTER to send · SHIFT+ENTER new line · Upload photos of court documents, police reports, transcripts</div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="app-right">
+      <div class="disc-box" style="font-size:0.7rem;">Not legal advice. Consult a licensed attorney.</div>
+      <div class="rphdr">// Quick Generate</div>
+      <button class="rabtn" onclick="gen('habeas')"><span>🏛</span> § 2254 Habeas Petition</button>
+      <button class="rabtn" onclick="gen('pcr')"><span>📋</span> PCR Application</button>
+      <button class="rabtn" onclick="gen('brady')"><span>🔍</span> Brady / FOIA Letter</button>
+      <button class="rabtn" onclick="gen('iac')"><span>⚖️</span> IAC Analysis</button>
+      <button class="rabtn" onclick="gen('timeline')"><span>📅</span> Case Timeline</button>
+      <button class="rabtn" onclick="gen('actionplan')"><span>📌</span> Action Plan</button>
+      <div class="rphdr" style="margin-top:14px;">// Study Tools</div>
+      <button class="rabtn" onclick="closeApp();scrollTo('transcript-sec')"><span>📖</span> Court Transcripts</button>
+      <button class="rabtn" onclick="closeApp();scrollTo('mock-sec')"><span>🎭</span> Mock Hearings</button>
+      <div class="rphdr" style="margin-top:14px;">// SC Hotlines</div>
+      <div style="font-size:0.72rem;color:var(--light);line-height:2.1;">
+        📞 SC Innocence Project<br><span style="color:var(--gold2);font-family:'IBM Plex Mono',monospace;">(803) 777-1646</span><br>
+        📞 SC Appleseed<br><span style="color:var(--gold2);font-family:'IBM Plex Mono',monospace;">(803) 779-1113</span><br>
+        📞 SC Legal Services<br><span style="color:var(--gold2);font-family:'IBM Plex Mono',monospace;">1-888-346-5592</span><br>
+        📞 Innocence Project (Nat'l)<br><span style="color:var(--gold2);font-family:'IBM Plex Mono',monospace;">(212) 364-5340</span><br>
+        📞 Equal Justice Initiative<br><span style="color:var(--gold2);font-family:'IBM Plex Mono',monospace;">(334) 269-1803</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════
+// LEGAL DOCTRINES
+// ═══════════════════════════════
+const DOCTRINES=[
+{cite:"Strickland v. Washington, 466 U.S. 668 (1984)",title:"Ineffective Assistance of Counsel",desc:"Applies to EVERY criminal case. Two prongs: (1) deficient performance — attorney fell below objective standard; (2) prejudice — reasonable probability outcome would differ. Covers trial, plea, sentencing, and appeal.",tip:"Failure to investigate witnesses, failure to file motions, failure to advise on plea consequences, sleeping at trial, conflict of interest — all documented grounds."},
+{cite:"Brady v. Maryland, 373 U.S. 83 (1963)",title:"Suppressed Exculpatory Evidence",desc:"Prosecution must disclose all material exculpatory AND impeachment evidence. Three elements: favorable, suppressed, material. Applies to police reports, lab results, witness deals, informant history.",tip:"Filed through FOIA/public records requests after conviction. Most Brady violations are discovered years later. Kyles v. Whitley (1995): all withheld evidence considered cumulatively."},
+{cite:"Napue v. Illinois, 360 U.S. 264 (1959)",title:"False Testimony / Undisclosed Deals",desc:"Prosecution cannot use false testimony or allow false testimony to go uncorrected. Giglio extension: all witness deals — reduced charges, money, immunity — must be disclosed.",tip:"Jailhouse snitches, lying informants, witnesses whose statements changed between police interview and trial — all potential Napue/Giglio violations."},
+{cite:"Boykin v. Alabama, 395 U.S. 238 (1969)",title:"Involuntary Guilty Plea",desc:"Guilty plea must be knowing, voluntary, and intelligent. Court must advise on all three rights: trial, confrontation, self-incrimination. Missing any element voids the plea.",tip:"Pull your plea transcript. Compare line by line. If the judge skipped any advisement, if you were coerced, if your attorney misinformed you about the sentence — that is a Boykin claim."},
+{cite:"Martinez v. Ryan, 566 U.S. 1 (2012)",title:"PCR Counsel IAC — Excusing Default",desc:"Where state requires IAC claims in PCR, ineffective PCR counsel excuses procedural default in federal habeas. Trevino v. Thaler (2013) extends it broadly.",tip:"If your PCR attorney was ineffective AND your underlying IAC claim has merit — federal court can review the claim even if it was not properly raised in state court."},
+{cite:"McQuiggin v. Perkins, 569 U.S. 383 (2013)",title:"Actual Innocence Gateway",desc:"Credible showing of actual innocence allows federal review of time-barred or defaulted claims. Schlup standard: new reliable evidence showing no reasonable juror would convict.",tip:"New evidence: DNA, recanted testimony, newly discovered witnesses, disproved forensics, newly discovered Brady material. This gateway opens the federal courthouse even after deadlines pass."},
+{cite:"Holland v. Florida, 560 U.S. 631 (2010)",title:"Equitable Tolling of AEDPA Deadline",desc:"One-year federal habeas deadline can be extended when petitioner shows: (1) diligent pursuit of rights AND (2) extraordinary circumstances prevented timely filing.",tip:"Attorney abandonment, mental illness, solitary confinement, lack of law library, state interference — all raised successfully. Not available for garden-variety negligence."},
+{cite:"Ake v. Oklahoma, 470 U.S. 68 (1985)",title:"Right to Expert Witnesses",desc:"Due process requires state to provide indigent defendants access to experts when critical to defense — psychiatric, forensic, DNA, ballistics, medical examiner, accident reconstruction.",tip:"If the State used an expert at trial and your attorney did not retain a defense expert to challenge it — and there were grounds to challenge — that is both an Ake violation and IAC."},
+{cite:"Dusky v. United States, 362 U.S. 402 (1960)",title:"Competency to Stand Trial",desc:"Defendant must have rational and factual understanding of proceedings AND sufficient ability to consult with attorney. Applies at trial, plea, and sentencing. Incompetency voids the proceedings.",tip:"Pate v. Robinson: court must hold hearing whenever there is bona fide doubt about competency. Prior hospitalizations, irrational behavior, inability to assist counsel — all trigger the duty."},
+{cite:"Batson v. Kentucky, 476 U.S. 79 (1986)",title:"Racial Discrimination in Jury Selection",desc:"Peremptory challenges cannot be used to strike jurors based on race. Three steps: prima facie case, race-neutral explanation, determination of pretext.",tip:"Must be raised DURING jury selection. Miller-El v. Dretke: compare how similar white and Black jurors were treated. Foster v. Chatman: explicit racial notes = direct Batson evidence."},
+{cite:"Ramos v. Louisiana, 140 S.Ct. 1390 (2020)",title:"Non-Unanimous Jury Verdicts",desc:"Unanimous verdict required for serious crime conviction. Affects Oregon and Louisiana convictions under 10-2 rule. Oregon is retroactively vacating non-unanimous verdicts.",tip:"Even if your conviction was unanimous, if any juror was coerced, pressured, or there was juror misconduct affecting deliberations — that is a separate claim."},
+{cite:"Padilla v. Kentucky, 559 U.S. 356 (2010)",title:"Failure to Advise on Consequences",desc:"Counsel must advise non-citizen clients on deportation consequences of plea. Extended in many courts to sex offender registration, professional license loss, housing eligibility, firearm rights.",tip:"If your attorney never told you about any consequence beyond prison time that you would have cared about — that is a Padilla-based IAC argument."},
+{cite:"Jackson v. Virginia, 443 U.S. 307 (1979)",title:"Insufficient Evidence",desc:"Due process requires proof beyond reasonable doubt of every element. Jackson claim: no rational trier of fact could find guilt. Available on direct appeal and in habeas.",tip:"Most powerful when: conviction rests solely on eyewitness ID, on a cooperating witness, on circumstantial evidence with no physical evidence, or when a key element was never proven."},
+{cite:"Miller v. Alabama, 567 U.S. 460 (2012)",title:"Juvenile LWOP — Mandatory Sentence",desc:"Mandatory life without parole for juvenile homicide defendants violates 8th Amendment. Montgomery v. Louisiana (2016) made this retroactive. Courts must now hold resentencing hearings.",tip:"If the offense occurred before age 18 and the defendant received mandatory LWOP — resentencing is required. Sentencing court must consider youth as mitigating factor."},
+{cite:"Cronic, 466 U.S. 648 (1984)",title:"Constructive Denial of Counsel",desc:"Where counsel entirely fails to function — sleeping, absent, representing adverse party, failing to oppose at critical stage — prejudice is PRESUMED. No Strickland showing needed.",tip:"Documented cases: attorney sleeping during trial, attorney who had never tried a murder case, attorney who failed to show up for critical hearings. Prejudice is automatic."},
+{cite:"Kyles v. Whitley, 514 U.S. 419 (1995)",title:"Cumulative Brady — All Evidence Together",desc:"Brady materiality assessed by cumulative effect of all withheld evidence. Prosecution charged with knowledge of evidence possessed by police. No specific request required.",tip:"Even if each withheld item seems small — together they may be material. List every piece of evidence that was not disclosed. Assess cumulatively, not piece by piece."}
+];
+
+// ═══════════════════════════════
+// TRANSCRIPTS
+// ═══════════════════════════════
+const TRANSCRIPTS={
+"tp-pcr":{title:"Post-Conviction Relief (PCR) Hearing — Strickland IAC",meta:"Composite Study Transcript — PCR Proceedings | FreedomFilings Study Edition",content:`
+<div class="tnote">📋 This composite study transcript shows how PCR hearings proceed. Use it to understand the structure and language before your own hearing. The PCR hearing is your opportunity to present evidence OUTSIDE the trial record.</div>
+<div class="tline"><div class="tspk clerk">COURT CLERK</div><div class="ttxt">All rise. The Court of Common Pleas is now in session, the Honorable [Judge] presiding. Be seated. The matter before the Court is the Application for Post-Conviction Relief. Counsel, state your appearances.</div></div>
+<div class="tline"><div class="tspk def">PCR COUNSEL</div><div class="ttxt">Good morning, Your Honor. [Name] appearing on behalf of the Petitioner, [Client Name].</div></div>
+<div class="tline"><div class="tspk prose">STATE'S COUNSEL</div><div class="ttxt">Good morning, Your Honor. [Name] for the State.</div></div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">This is the evidentiary hearing on the PCR Application. Petitioner alleges ineffective assistance of trial counsel under Strickland v. Washington. The burden is on the Petitioner. PCR counsel, call your first witness.</div></div>
+<div class="talert"><strong>⚠ KEY POINT:</strong> Unlike direct appeal, a PCR hearing lets you present NEW evidence — witnesses who were never called, attorney testimony, expert opinions, documents never used at trial. This is your chance to build a complete factual record outside the trial record.</div>
+<div class="tline"><div class="tspk def">PCR COUNSEL</div><div class="ttxt">The Petitioner calls trial counsel, [Attorney Name], to the stand.</div></div>
+<div class="tline"><div class="tspk wit">TRIAL COUNSEL (SWORN)</div><div class="ttxt">I do.</div></div>
+<div class="tline"><div class="tspk def">PCR COUNSEL</div><div class="ttxt">You represented the Petitioner at trial?</div></div>
+<div class="tline"><div class="tspk wit">TRIAL COUNSEL</div><div class="ttxt">Yes.</div></div>
+<div class="tline"><div class="tspk def">PCR COUNSEL</div><div class="ttxt">Did you investigate potential alibi witnesses before trial?</div></div>
+<div class="tline"><div class="tspk wit">TRIAL COUNSEL</div><div class="ttxt">I spoke with the Petitioner. He gave me some names.</div></div>
+<div class="tline"><div class="tspk def">PCR COUNSEL</div><div class="ttxt">Did you interview those witnesses? Take statements? Subpoena them?</div></div>
+<div class="tline"><div class="tspk wit">TRIAL COUNSEL</div><div class="ttxt">I did not, no.</div></div>
+<div class="tline"><div class="tspk def">PCR COUNSEL</div><div class="ttxt">Why not?</div></div>
+<div class="tline"><div class="tspk wit">TRIAL COUNSEL</div><div class="ttxt">I made a strategic decision to focus on cross-examining the State's witnesses.</div></div>
+<div class="talert"><strong>⚠ "STRATEGIC DECISION" — The State's Favorite Argument:</strong> Every attorney claims strategy. Under Strickland and Wiggins v. Smith (2003), a strategic decision is only protected if it is made AFTER adequate investigation. You cannot claim strategy when you never investigated. PCR counsel must press: "What did you know about those witnesses before deciding not to call them?"</div>
+<div class="tline"><div class="tspk def">PCR COUNSEL</div><div class="ttxt">Your Honor, we offer as Exhibits A, B, and C the sworn affidavits of three witnesses who were available at the time of trial, who would have testified that the Petitioner was with them when the offense allegedly occurred, and who were never contacted by trial counsel.</div></div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">The exhibits are admitted. State, your cross-examination?</div></div>
+<div class="tline"><div class="tspk prose">STATE'S COUNSEL</div><div class="ttxt">You have practiced criminal defense for how many years?</div></div>
+<div class="tline"><div class="tspk wit">TRIAL COUNSEL</div><div class="ttxt">Fifteen years.</div></div>
+<div class="tline"><div class="tspk prose">STATE'S COUNSEL</div><div class="ttxt">And you made a professional judgment about how to try this case — focusing on the State's witnesses rather than presenting defense witnesses?</div></div>
+<div class="tline"><div class="tspk wit">TRIAL COUNSEL</div><div class="ttxt">Yes, that was my approach.</div></div>
+<div class="tnote">💡 AFTER THE HEARING: The PCR court will issue a written order. If denied, you must file a timely appeal. Missing the PCR appeal deadline can bar your federal habeas — unless Martinez v. Ryan applies (ineffective PCR counsel).</div>`},
+"tp-plea":{title:"Guilty Plea Colloquy — Boykin v. Alabama Requirements",meta:"Composite Study Transcript — Plea Proceedings | FreedomFilings Study Edition",content:`
+<div class="tnote">📋 Pull your own plea transcript and compare it line by line to this sample. Every required element the judge SKIPPED is a potential Boykin violation and grounds for post-conviction relief.</div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">Mr./Ms. [Defendant], you've indicated you wish to plead guilty. Before I accept your plea, I'm required to advise you of your rights and make sure you understand what you're giving up. Are you able to understand me today?</div></div>
+<div class="talert"><strong>⚠ FIRST REQUIREMENT:</strong> Court must establish basic competency to enter the plea. Mental illness, medication, intellectual disability, language barriers — if present and not addressed, the plea may be void under Dusky as well as Boykin.</div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">You have the right to plead not guilty and go to trial. At trial you would have the right to a jury of your peers. Do you understand that right?</div></div>
+<div class="tline"><div class="tspk wit">DEFENDANT</div><div class="ttxt">Yes, sir.</div></div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">At trial you have the right to confront and cross-examine every witness the State calls against you. Do you understand that right?</div></div>
+<div class="tline"><div class="tspk wit">DEFENDANT</div><div class="ttxt">Yes.</div></div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">At trial you have the right to remain silent. You cannot be forced to testify. And if you choose not to testify, the jury would be told they cannot hold your silence against you. Do you understand that right?</div></div>
+<div class="talert"><strong>⚠ BOYKIN'S THREE REQUIRED RIGHTS:</strong> All three must be on the record — (1) right to jury trial, (2) right to confront witnesses, (3) right against self-incrimination. If ANY of the three is missing from your actual plea transcript, that is a Boykin violation requiring the plea be set aside.</div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">By pleading guilty, you are waiving — giving up — every one of those rights permanently. Do you understand that?</div></div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">Has anyone forced you, threatened you, or made any promises to you outside the plea agreement to get you to plead guilty today?</div></div>
+<div class="tnote">💡 "NO" DOES NOT BAR LATER COERCION CLAIM: Even if you answered "No" to this question, a later claim of coercion is not automatically barred. If your attorney told you "take this plea or you'll get life" without conducting adequate investigation — that pressure combined with inadequate investigation supports an involuntary plea claim.</div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">The maximum sentence for this charge is [X] years. The Court is not bound by the plea agreement and can impose any sentence up to the maximum. Do you understand that?</div></div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">The Court finds the plea knowing, voluntary, and intelligent. The plea is accepted. [Sentencing date set.]</div></div>
+<div class="talert"><strong>⚠ COMPARE YOUR TRANSCRIPT NOW:</strong> (1) Were all three rights stated clearly? (2) Were you asked about coercion? (3) Were you told the maximum sentence? (4) Were you told the court isn't bound by the agreement? (5) Was the factual basis for the plea stated on the record? Missing elements = Boykin claim.</div>`},
+"tp-sentencing":{title:"Sentencing Hearing — Mitigation Arguments",meta:"Composite Study Transcript — Sentencing Proceedings | FreedomFilings Study Edition",content:`
+<div class="tnote">📋 Sentencing IAC is one of the most powerful PCR claims. If your attorney presented no witnesses, no letters, no mitigation evidence at sentencing — that failure can be its own IAC claim separate from trial IAC. Wiggins v. Smith (2003) and Rompilla v. Beard (2005) establish the standard.</div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">We are here for sentencing. I have reviewed the Pre-Sentence Investigation Report. Defense counsel, have you reviewed it with your client?</div></div>
+<div class="tline"><div class="tspk def">DEFENSE COUNSEL</div><div class="ttxt">Yes, Your Honor, and we have objections to several factual findings in the PSI.</div></div>
+<div class="talert"><strong>⚠ PSI ERRORS ARE COMMON:</strong> Pre-Sentence Reports frequently contain errors — prior convictions that don't belong to your client, inflated descriptions of the offense, incorrect guidelines calculations, inaccurate victim impact summaries. Failure to object to PSI errors is itself IAC. If errors were not objected to at sentencing, raise this in PCR.</div>
+<div class="tline"><div class="tspk prose">PROSECUTOR</div><div class="ttxt">Your Honor, the State requests [X] years. The defendant has shown no remorse. The offense was serious. The victim's family is here today and has submitted a victim impact statement. The State believes this sentence is necessary to protect the community.</div></div>
+<div class="tline"><div class="tspk def">DEFENSE COUNSEL</div><div class="ttxt">Your Honor, the defense asks the Court to see the whole person before it — not just this offense. [Client] grew up in [circumstances]. He/she has [family, employment history, community ties]. We have submitted eight letters from family members, former employers, and community members who know this person. We are also asking the Court to consider [mental health history, substance abuse history, trauma].</div></div>
+<div class="tnote">💡 WHAT MITIGATION INVESTIGATION REQUIRES: Effective counsel must spend weeks — not hours — investigating mitigation. Medical records, school records, employment records, family interviews, mental health evaluation, substance abuse history, childhood trauma documentation. One meeting the day before sentencing is NOT adequate investigation.</div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">Does the defendant wish to address the Court?</div></div>
+<div class="tline"><div class="tspk wit">DEFENDANT (ALLOCUTION)</div><div class="ttxt">Your Honor, I want to take responsibility. I also want the Court to know who I am beyond this moment. I have children who depend on me. I have a mother who is ill. I am asking for mercy — not because I deserve it, but because I can still be someone worth bringing home.</div></div>
+<div class="talert"><strong>⚠ RIGHT OF ALLOCUTION:</strong> Every defendant has the constitutional right to speak at sentencing before sentence is imposed. If the court did not offer you the opportunity to speak, OR if your attorney did not inform you of this right, that is constitutional error.</div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">The Court sentences the Defendant to [X] years. Credit for time served. You have 30 days to file a direct appeal from today's date.</div></div>`},
+"tp-habeas":{title:"Federal Habeas Corpus — 28 U.S.C. § 2254 Hearing",meta:"Composite Study Transcript — Federal District Court | FreedomFilings Study Edition",content:`
+<div class="tnote">📋 Federal habeas is your final federal remedy after state courts have denied relief. Understanding AEDPA's demanding standards helps you know what arguments will work and why.</div>
+<div class="tline"><div class="tspk judge">DISTRICT JUDGE</div><div class="ttxt">We are here on the habeas petition under 28 U.S.C. § 2254. The petitioner alleges constitutional violations in the underlying state conviction. Counsel, I want to begin with exhaustion. Walk me through what was raised in state court and when.</div></div>
+<div class="talert"><strong>⚠ EXHAUSTION IS THRESHOLD:</strong> You must present every claim to the highest state court available BEFORE filing federal habeas. Claims never raised in state court are procedurally defaulted. This is the most common reason federal habeas petitions are dismissed without reaching the merits.</div>
+<div class="tline"><div class="tspk app">HABEAS COUNSEL</div><div class="ttxt">Your Honor, we have fully exhausted. The IAC claim was raised in the PCR application, adjudicated at the PCR hearing, appealed to the Court of Appeals, and presented to the state Supreme Court, which denied certiorari. We have attached the complete state court record as Exhibit 1.</div></div>
+<div class="tline"><div class="tspk judge">DISTRICT JUDGE</div><div class="ttxt">And what is your strongest claim?</div></div>
+<div class="tline"><div class="tspk app">HABEAS COUNSEL</div><div class="ttxt">Brady, Your Honor. After PCR was denied, we submitted FOIA requests to the police department and the prosecutor's office. We received a lab report — addressed to the prosecutor's office, dated three weeks before trial — showing the DNA profile from the crime scene did not match the petitioner. That report was never disclosed to defense counsel. Under Brady, Kyles, and Strickler v. Greene, this is material — there is a reasonable probability the verdict would have been different.</div></div>
+<div class="tline"><div class="tspk prose">STATE'S COUNSEL</div><div class="ttxt">Your Honor, the AEDPA standard requires this Court to defer to the state court's factual findings. The state PCR court considered the evidence and denied relief. Under § 2254(d), that decision must stand unless it was an unreasonable application of clearly established federal law — and it was not.</div></div>
+<div class="tnote">💡 AEDPA DEFERENCE: Under 28 U.S.C. § 2254(d), federal courts defer to state court decisions unless they are: (1) contrary to clearly established federal law, OR (2) an unreasonable APPLICATION of federal law, OR (3) based on unreasonable determination of the facts. "Unreasonable" means more than wrong — but it is not an impossible standard. Many habeas petitions succeed.</div>
+<div class="tline"><div class="tspk app">HABEAS COUNSEL</div><div class="ttxt">Your Honor, the state PCR court never considered the DNA evidence — we discovered it through FOIA after PCR was denied. This is newly discovered Brady material. The state court could not have made a reasonable determination based on evidence it never saw. This Court reviews it de novo under Martinez v. Ryan and the actual innocence gateway.</div></div>
+<div class="tline"><div class="tspk judge">DISTRICT JUDGE</div><div class="ttxt">I will issue a written ruling. If the petition is denied, a certificate of appealability will be addressed at that time. Counsel should be prepared to address whether the issues presented are reasonably debatable among jurists.</div></div>
+<div class="talert"><strong>⚠ CERTIFICATE OF APPEALABILITY:</strong> To appeal a denied habeas to the Circuit Court of Appeals, you must obtain a COA showing a "substantial showing of the denial of a constitutional right." This means the issue must be debatable — you don't have to prove you win, just that reasonable jurists could disagree.</div>`},
+"tp-suppress":{title:"Motion to Suppress — Fourth Amendment Search & Seizure",meta:"Composite Study Transcript — Suppression Hearing | FreedomFilings Study Edition",content:`
+<div class="tnote">📋 A suppression hearing decides whether evidence was obtained illegally and must be excluded. If your attorney did NOT file a suppression motion when there were grounds, that failure is IAC.</div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">This is the hearing on the Defendant's Motion to Suppress. Defendant contends the search violated the Fourth Amendment. Officer [Name], you are still under oath. Defense, proceed.</div></div>
+<div class="tline"><div class="tspk def">DEFENSE COUNSEL</div><div class="ttxt">Officer, you stopped my client's vehicle for a minor lane drift, correct?</div></div>
+<div class="tline"><div class="tspk wit">OFFICER</div><div class="ttxt">Yes. He briefly crossed the center line.</div></div>
+<div class="tline"><div class="tspk def">DEFENSE COUNSEL</div><div class="ttxt">After the stop, you detained my client for 47 minutes before the search, correct?</div></div>
+<div class="tline"><div class="tspk wit">OFFICER</div><div class="ttxt">Yes. I called for a K-9 unit.</div></div>
+<div class="tline"><div class="tspk def">DEFENSE COUNSEL</div><div class="ttxt">Rodriguez v. United States, decided by the Supreme Court in 2015, holds that a traffic stop cannot be extended even briefly for a dog sniff without independent reasonable suspicion of criminal activity. What specific articulable facts did you have of criminal activity beyond the lane drift?</div></div>
+<div class="tline"><div class="tspk wit">OFFICER</div><div class="ttxt">He was nervous. He was in a high-drug area.</div></div>
+<div class="talert"><strong>⚠ "NERVOUSNESS" + "HIGH-CRIME AREA":</strong> Courts have repeatedly held that nervousness during a police stop — which describes nearly everyone — combined only with being in a "high-crime area" is insufficient for reasonable suspicion. Illinois v. Wardlow (2000). These alone cannot justify extending a traffic stop.</div>
+<div class="tline"><div class="tspk def">DEFENSE COUNSEL</div><div class="ttxt">Your Honor, under Rodriguez, the extension of this stop for 47 minutes was constitutionally impermissible. All evidence obtained from that extension — including the K-9 alert and the subsequent search — must be suppressed as fruit of the poisonous tree under Wong Sun v. United States.</div></div>
+<div class="tline"><div class="tspk prose">PROSECUTOR</div><div class="ttxt">Your Honor, the officer had reasonable articulable suspicion. The defendant's behavior during the stop provided additional grounds. The search was lawful.</div></div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">The Court [grants/denies] the motion. [If denied: This ruling is preserved for direct appeal. If not raised on direct appeal, the suppression issue may be barred in post-conviction — but the failure to raise it on appeal is itself an IAC claim.]</div></div>`},
+"tp-appeal":{title:"Direct Appeal Oral Argument — State Court of Appeals",meta:"Composite Study Transcript — Appellate Court | FreedomFilings Study Edition",content:`
+<div class="tnote">📋 Direct appeal is limited to issues preserved in the trial record. IAC claims generally CANNOT be raised on direct appeal — they require PCR. Understanding this prevents wasting your one direct appeal opportunity.</div>
+<div class="tline"><div class="tspk judge">CHIEF JUDGE</div><div class="ttxt">This is the appeal of [Defendant] from the judgment of conviction. Appellant has 20 minutes. Proceed.</div></div>
+<div class="tline"><div class="tspk app">APPELLANT'S COUNSEL</div><div class="ttxt">Thank you. Appellant raises three grounds. First, the trial court improperly denied the suppression motion — Rodriguez v. United States required suppression of all evidence from the unlawful extension of the stop. Second, the evidence was insufficient to support conviction on count two — the State failed to prove an essential element beyond reasonable doubt. Third, the trial court admitted prejudicial prior acts evidence in violation of Rule 404(b).</div></div>
+<div class="tline"><div class="tspk judge">JUDGE 2</div><div class="ttxt">On the suppression issue — was the Rodriguez argument raised in the trial court?</div></div>
+<div class="talert"><strong>⚠ PRESERVATION IS EVERYTHING ON DIRECT APPEAL:</strong> Issues not raised at trial are waived — reviewed only for "plain error," which is a nearly impossible standard. If your attorney failed to object at trial, that objection is lost on direct appeal. But that failure is IAC, which must be raised in PCR, not on direct appeal.</div>
+<div class="tline"><div class="tspk app">APPELLANT'S COUNSEL</div><div class="ttxt">Yes, Your Honor. The motion was filed pretrial, argued at a hearing, denied, and the denial was renewed at trial. The issue is fully preserved for de novo review by this Court.</div></div>
+<div class="tline"><div class="tspk judge">CHIEF JUDGE</div><div class="ttxt">On the sufficiency claim — what is our standard of review?</div></div>
+<div class="tline"><div class="tspk app">APPELLANT'S COUNSEL</div><div class="ttxt">Jackson v. Virginia: whether any rational trier of fact could have found the essential elements beyond reasonable doubt, viewing the evidence in the light most favorable to the prosecution. Our argument is that no rational juror could have found [element X] based solely on the contradicted testimony of a cooperating witness with a deal pending.</div></div>
+<div class="tnote">💡 AFTER DIRECT APPEAL: Once the direct appeal decision is issued, your PCR clock often starts. In most states you have ONE YEAR from exhaustion of direct appeal. Do not wait. Begin PCR preparation immediately. Missing the PCR deadline can permanently bar state and federal relief.</div>`},
+"tp-competency":{title:"Competency to Stand Trial — Dusky Standard Hearing",meta:"Composite Study Transcript — Competency Proceedings | FreedomFilings Study Edition",content:`
+<div class="tnote">📋 If your loved one had mental health issues and no competency hearing was ordered — that is a constitutional violation under Pate v. Robinson requiring reversal, regardless of guilt or innocence.</div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">The Court ordered a competency evaluation. We have the report from Dr. [Expert]. Doctor, you are sworn. Please summarize your findings for the record.</div></div>
+<div class="tline"><div class="tspk wit">FORENSIC PSYCHOLOGIST</div><div class="ttxt">Your Honor, I evaluated [Defendant] over three sessions totaling approximately six hours. I administered the MacCAT-CA competency assessment instrument and reviewed prior mental health records, which include two prior involuntary psychiatric commitments and a diagnosis of [condition]. I also reviewed the criminal history and spoke with defense counsel about specific difficulties encountered.</div></div>
+<div class="tline"><div class="tspk wit">FORENSIC PSYCHOLOGIST</div><div class="ttxt">It is my professional opinion that [Defendant] does not presently have a sufficient ability to consult with his/her attorney with a reasonable degree of rational understanding. Specifically, he/she cannot provide a coherent account of the events underlying the charges, cannot assist in evaluating the evidence, and cannot make rational decisions about legal strategy.</div></div>
+<div class="talert"><strong>⚠ BOTH PRONGS OF DUSKY:</strong> (1) Rational understanding of proceedings AND (2) Ability to assist counsel. Many defendants understand "what a trial is" but cannot actually HELP their attorney. The second prong — ability to assist — is the one most often overlooked by trial courts.</div>
+<div class="tline"><div class="tspk def">DEFENSE COUNSEL</div><div class="ttxt">Doctor, in your professional opinion, was the Defendant competent at the time of the guilty plea entered approximately four months ago?</div></div>
+<div class="tline"><div class="tspk wit">FORENSIC PSYCHOLOGIST</div><div class="ttxt">Based on my review of the records and the documented progression of the condition, it is my opinion that the Defendant's competency at the time of the plea was significantly compromised by the same condition that affects him/her today.</div></div>
+<div class="tnote">💡 RETROSPECTIVE COMPETENCY: Courts can assess whether a defendant was competent at the time of a prior proceeding — including at the time of a guilty plea. If the record showed signs of mental illness (irrational statements, confusion, documented prior hospitalizations) and no hearing was held — that is a Pate v. Robinson claim.</div>`},
+"tp-brady":{title:"Brady Violation Hearing — Newly Discovered Evidence",meta:"Composite Study Transcript — Post-Conviction Brady Hearing | FreedomFilings Study Edition",content:`
+<div class="tnote">📋 Brady hearings in post-conviction happen when evidence surfaces that prosecution had before trial but never disclosed. This is one of the most powerful grounds for relief because it attacks the government's integrity directly.</div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">This hearing was called following the Petitioner's Motion for New Trial based on newly discovered Brady material. Petitioner contends the prosecution possessed evidence that was not disclosed. Counsel, present the evidence.</div></div>
+<div class="tline"><div class="tspk app">PETITIONER'S COUNSEL</div><div class="ttxt">Your Honor, we submitted a FOIA request to the police department and the prosecutor's office after the denial of direct appeal. In response, we received three documents that were never disclosed to defense counsel: first, a written statement from the State's key witness, taken two weeks before trial, in which that witness described the perpetrator in terms that do not match our client. Second, a laboratory report showing the fingerprint recovered at the scene did not match our client. Third, internal communications showing the prosecution was aware of both documents before trial.</div></div>
+<div class="talert"><strong>⚠ HOW TO FIND BRADY MATERIAL:</strong> (1) FOIA/public records requests to the police department — request ALL records related to your case including officer notes, dispatch logs, interview recordings, lab submissions; (2) Request the prosecutor's complete file; (3) Request all informant files; (4) Request all expert reports, including those not used at trial; (5) Review civil case records if the same incident generated civil litigation.</div>
+<div class="tline"><div class="tspk prose">STATE'S COUNSEL</div><div class="ttxt">Your Honor, the State disputes that these documents were deliberately suppressed. Assuming they existed in our files — which we do not concede — there was no bad faith. Oversight is not a Brady violation.</div></div>
+<div class="tline"><div class="tspk app">PETITIONER'S COUNSEL</div><div class="ttxt">Your Honor, Brady does not require bad faith. Strickler v. Greene, 527 U.S. 263 (1999): the prosecutor's good or bad faith is irrelevant. If the evidence was favorable, if it was in the government's possession, and if it was not disclosed, Brady is violated. Period. The fingerprint report alone — showing the crime scene print didn't match — is directly exculpatory on the central factual question of who committed this offense.</div></div>
+<div class="tline"><div class="tspk judge">THE COURT</div><div class="ttxt">The Court is troubled by these disclosures. State, I want sworn affidavits from the trial prosecutor explaining when each document came into the office's possession and what happened to it. The matter is continued pending those affidavits. This Court takes Brady obligations seriously.</div></div>
+<div class="tnote">💡 THREE BRADY ELEMENTS: (1) FAVORABLE — either directly exculpatory OR useful to impeach a prosecution witness; (2) SUPPRESSED — prosecution had it and didn't give it to defense (no specific request required after Kyles); (3) MATERIAL — reasonable probability of different outcome. On materiality: consider how important the witness was, how close the case was, and what the jury would have done if they had seen this evidence.</div>`}
+};
+
+// ═══════════════════════════════
+// MOCK SCENARIOS
+// ═══════════════════════════════
+const MOCKS={
+pcr_opening:{stage:"PCR Hearing — Opening",scene:"State court PCR evidentiary hearing. The petitioner is challenging the conviction based on trial counsel's failure to investigate alibi witnesses. The judge will hear testimony and evidence outside the original trial record.",tip:"PCR hearings are your best chance to present facts the jury never heard. New witnesses, attorney admissions, expert testimony — all allowed.",dialogue:[
+{r:"judge",rl:"THE COURT",t:"This Court is convened for the PCR evidentiary hearing. Petitioner alleges ineffective assistance of trial counsel under Strickland v. Washington. Burden is on the Petitioner. PCR counsel, proceed."},
+{r:"def",rl:"PCR COUNSEL",t:"Your Honor, the evidence will show that trial counsel never interviewed three alibi witnesses who would have placed our client elsewhere when the crime occurred. Counsel made no attempt — not a strategic choice, a failure to investigate. That is textbook deficient performance under Strickland."},
+{r:"prose",rl:"STATE'S COUNSEL",t:"Your Honor, trial counsel has 15 years of experience. He made a professional judgment to focus on cross-examination. Courts must 'avoid the distorting effects of hindsight.' This is second-guessing, not a constitutional violation."},
+{r:"def",rl:"PCR COUNSEL",t:"PCR counsel calls trial attorney [Name] to the stand."},
+{r:"judge",rl:"THE COURT",t:"Proceed."}
+]},
+pcr_iac:{stage:"PCR — Cross-Examining Trial Counsel",scene:"Trial counsel is on the stand. PCR counsel is exposing the failure to investigate through cross-examination. This is the most critical moment in most PCR hearings.",tip:"Effective cross-examination forces trial counsel to admit what they did NOT do. A strategic decision made without investigation is not strategy — it's deficiency.",dialogue:[
+{r:"def",rl:"PCR COUNSEL",t:"You were given the names of three alibi witnesses by your client before trial, correct?"},
+{r:"wit",rl:"TRIAL COUNSEL",t:"He mentioned some names, yes."},
+{r:"def",rl:"PCR COUNSEL",t:"Did you interview any of them?"},
+{r:"wit",rl:"TRIAL COUNSEL",t:"I did not, no."},
+{r:"def",rl:"PCR COUNSEL",t:"Did you send an investigator? Take any statements? Subpoena any records to verify what they would say?"},
+{r:"wit",rl:"TRIAL COUNSEL",t:"No. I made a strategic decision to focus on cross-examining the State's witnesses."},
+{r:"def",rl:"PCR COUNSEL",t:"A strategic decision made before you knew what any of those alibi witnesses would have said?"},
+{r:"wit",rl:"TRIAL COUNSEL",t:"That's... correct. I didn't know the specifics of their testimony."},
+{r:"def",rl:"PCR COUNSEL",t:"Your Honor, Exhibits A, B, C — affidavits of all three witnesses, signed under oath, stating they were with the Petitioner at the time of the offense. None were ever contacted. Under Wiggins v. Smith, a decision made without investigation is not strategy — it is deficiency."}
+]},
+plea:{stage:"Guilty Plea Colloquy — Boykin Requirements",scene:"Defendant is entering a guilty plea. Watch every advisement the judge gives. Missing elements = grounds for post-conviction relief.",tip:"Compare this exactly to your own plea transcript. Every element the judge skipped is a potential Boykin violation.",dialogue:[
+{r:"judge",rl:"THE COURT",t:"You have the right to plead not guilty and go to trial before a jury. Do you understand that right?"},
+{r:"wit",rl:"DEFENDANT",t:"Yes, sir."},
+{r:"judge",rl:"THE COURT",t:"At trial you have the right to confront and cross-examine every witness the State calls against you. Do you understand that?"},
+{r:"wit",rl:"DEFENDANT",t:"Yes."},
+{r:"judge",rl:"THE COURT",t:"You have the right to remain silent. You cannot be forced to testify. If you choose not to testify, the jury would be told they cannot hold your silence against you. Do you understand?"},
+{r:"wit",rl:"DEFENDANT",t:"Yes, Your Honor."},
+{r:"judge",rl:"THE COURT",t:"By pleading guilty you are giving up every one of those rights permanently. Is anyone forcing or threatening you to plead guilty?"},
+{r:"wit",rl:"DEFENDANT",t:"No."},
+{r:"judge",rl:"THE COURT",t:"The Court finds the plea knowing, voluntary, and intelligent. [NOTE: If ANY of those three rights was missing from YOUR actual plea transcript — that is a Boykin violation. Pull your transcript and compare line by line.]"}
+]},
+sentencing:{stage:"Sentencing — Defense Mitigation",scene:"Sentencing hearing after conviction or plea. Watch how effective defense counsel presents mitigation — and what happens when they don't.",tip:"If your attorney presented no witnesses, no documents, and no mitigation at sentencing, that is a separate and powerful IAC claim under Wiggins v. Smith.",dialogue:[
+{r:"prose",rl:"PROSECUTOR",t:"Your Honor, the offense was serious. The defendant has shown no remorse. The State asks for the maximum sentence of [X] years."},
+{r:"def",rl:"DEFENSE COUNSEL",t:"Your Honor, the defense asks the Court to see the whole person. [Client] grew up in [difficult circumstances]. He/she has struggled with [substance abuse / mental illness]. He/she has [family, employment history, community ties]. We have submitted character letters from [family, employer, pastor, community members]. The Pre-Sentence Report does not capture who this person is."},
+{r:"judge",rl:"THE COURT",t:"Does your client wish to address the Court?"},
+{r:"wit",rl:"DEFENDANT (ALLOCUTION)",t:"Your Honor, I take responsibility. I also want the Court to know I have children waiting for me. I have a mother who depends on me. I am asking for mercy — not because I deserve it, but because I can still be the person my family needs me to be. Please."},
+{r:"judge",rl:"THE COURT",t:"The Court has considered all factors. [Client] is sentenced to [X] years. You have 30 days from today to file a direct appeal. [If no mitigation was presented: that absence is itself an IAC claim in PCR under Wiggins v. Smith (2003).]"}
+]},
+habeas:{stage:"Federal Habeas — District Court Argument",scene:"Federal district court. Habeas counsel argues why the state court's denial of PCR was constitutionally unreasonable under AEDPA.",tip:"Federal habeas is the final federal remedy. AEDPA is demanding but not impossible. Brady, actual innocence, and Martinez are the most successful pathways.",dialogue:[
+{r:"judge",rl:"FEDERAL JUDGE",t:"Walk me through your strongest claim."},
+{r:"app",rl:"HABEAS COUNSEL",t:"Brady, Your Honor. Through FOIA after PCR was denied, we found a police lab report dated before trial showing the crime scene DNA did not match the petitioner. That report was addressed to the prosecutor's office. It was never disclosed."},
+{r:"judge",rl:"FEDERAL JUDGE",t:"Is exhaustion satisfied?"},
+{r:"app",rl:"HABEAS COUNSEL",t:"Yes — we returned to state court with the newly discovered evidence, were denied, and appealed to the state Supreme Court. Full exhaustion."},
+{r:"prose",rl:"STATE'S COUNSEL",t:"Your Honor, AEDPA requires deference to state court findings. The state court denied relief. This Court cannot substitute its judgment."},
+{r:"app",rl:"HABEAS COUNSEL",t:"The state court never considered this DNA evidence. AEDPA deference requires a state court decision — there was none on this evidence. And under McQuiggin v. Perkins, the actual innocence gateway removes AEDPA procedural bars entirely when new evidence shows no reasonable juror would convict."}
+]},
+suppress:{stage:"Motion to Suppress — 4th Amendment",scene:"Trial court hearing on whether evidence from a traffic stop and search must be suppressed because police exceeded their authority.",tip:"Rodriguez v. United States (2015) prohibits extending a traffic stop for a dog sniff without independent reasonable suspicion. This is one of the most litigated suppression issues.",dialogue:[
+{r:"def",rl:"DEFENSE COUNSEL",t:"Officer, the traffic stop lasted 47 minutes before you searched my client's vehicle. The only traffic violation was a brief lane drift. What specific articulable facts supported extending the stop beyond the time needed to address that violation?"},
+{r:"wit",rl:"OFFICER",t:"He was nervous. Wouldn't make eye contact. We were in a high-drug area."},
+{r:"def",rl:"DEFENSE COUNSEL",t:"Rodriguez v. United States holds that a stop cannot be extended for a dog sniff without independent reasonable suspicion. Nervousness and a general area designation — which the Supreme Court has said applies to millions of Americans — is not reasonable suspicion. All evidence from the extended detention must be suppressed as fruit of the poisonous tree."},
+{r:"prose",rl:"PROSECUTOR",t:"The extension was justified. The officer observed additional indicators of criminal activity during the lawful stop."},
+{r:"judge",rl:"THE COURT",t:"The Court will review the body cam footage and issue a ruling. [NOTE: If no body cam footage exists and the officer's account is the only record — that is an additional argument. The government bears the burden on suppression motions.]"}
+]},
+brady:{stage:"Brady Evidence Hearing",scene:"Post-conviction court hearing newly discovered Brady material that was in the prosecution's possession before trial but never disclosed.",tip:"FOIA requests filed after conviction often surface Brady material. Request everything — every police report, every lab submission, every officer note, every internal email about your case.",dialogue:[
+{r:"app",rl:"PETITIONER'S COUNSEL",t:"Your Honor, through FOIA we obtained a statement the prosecution's key witness gave to police two weeks before trial. In that statement the witness described the perpetrator as [description that doesn't match the petitioner]. At trial that same witness identified the petitioner. The jury never saw the prior inconsistent statement."},
+{r:"judge",rl:"THE COURT",t:"How do you know this was in the prosecution's possession?"},
+{r:"app",rl:"PETITIONER'S COUNSEL",t:"The statement header shows it was transmitted to the prosecutor's office on [date]. The prosecution's own discovery log, which we also obtained through FOIA, lists it as received. There is no notation that it was provided to defense counsel."},
+{r:"prose",rl:"STATE'S COUNSEL",t:"Your Honor, even if not disclosed, the statement is not material. The witness identified the defendant at trial. The jury believed the trial testimony."},
+{r:"app",rl:"PETITIONER'S COUNSEL",t:"Brady materiality is not whether other evidence supported conviction. It is whether there is a reasonable probability the result would differ if the jury had seen this. A prior inconsistent description by the only eyewitness — that is the definition of material impeachment evidence under Giglio v. United States."}
+]},
+batson:{stage:"Batson Challenge — Jury Discrimination",scene:"During jury selection, defense counsel challenges the prosecution's racially discriminatory use of peremptory strikes. Must be raised BEFORE the jury is sworn.",tip:"Document every comparable white juror who shared the same characteristic used to justify striking a Black juror. That comparison — called comparative juror analysis — is your Batson argument.",dialogue:[
+{r:"def",rl:"DEFENSE COUNSEL",t:"Your Honor, the defense raises a Batson challenge. The State has used 5 of its 6 peremptory strikes against Black jurors. That establishes a prima facie case of purposeful racial discrimination."},
+{r:"judge",rl:"THE COURT",t:"Prima facie case is established. State, provide race-neutral explanations for each strike."},
+{r:"prose",rl:"PROSECUTOR",t:"Juror 3 — expressed distrust of police. Juror 6 — had a relative previously convicted. Juror 11 — seemed inattentive. Juror 14 — gave inconsistent answers."},
+{r:"def",rl:"DEFENSE COUNSEL",t:"Your Honor, white juror 5 also expressed concern about police — not struck. White juror 8 also had a family member convicted — not struck. The explanations are pretextual. Under Miller-El v. Dretke, comparative juror analysis compels the finding that race was the real reason for these strikes."},
+{r:"judge",rl:"THE COURT",t:"The Court will review the voir dire transcript for comparators. [NOTE: If Batson challenge is denied, it is preserved for direct appeal and federal habeas. Document every comparable juror now.]"}
+]},
+competency:{stage:"Competency Hearing — Dusky Standard",scene:"Court hearing to determine whether defendant is competent to proceed. Mental illness, intellectual disability, and trauma can all affect competency.",tip:"If signs of mental illness were present and no competency hearing was ordered, that is a Pate v. Robinson violation requiring automatic reversal.",dialogue:[
+{r:"judge",rl:"THE COURT",t:"Dr. [Expert], please summarize your competency evaluation findings."},
+{r:"wit",rl:"FORENSIC PSYCHOLOGIST",t:"Your Honor, I conducted three evaluation sessions totaling six hours. I administered standardized competency instruments and reviewed prior mental health records — including two prior involuntary commitments and a diagnosis of [condition]. My opinion is that the Defendant does not presently have the ability to assist counsel with a reasonable degree of rational understanding."},
+{r:"def",rl:"DEFENSE COUNSEL",t:"In your opinion, was the Defendant competent at the time of the guilty plea entered six months ago?"},
+{r:"wit",rl:"FORENSIC PSYCHOLOGIST",t:"Based on the documented progression of the condition and the records from that period, it is my opinion that the Defendant's competency at the time of the plea was significantly compromised by the same condition."},
+{r:"judge",rl:"THE COURT",t:"The Court finds the Defendant currently incompetent. [Defendant] is committed for restoration. [NOTE: A plea entered while incompetent is void. This is grounds for PCR to withdraw the plea entirely under Boykin and Dusky together.]"}
+]},
+voir_dire:{stage:"Voir Dire — Jury Selection",scene:"The jury selection process. Understanding voir dire helps identify juror bias claims and Batson issues for post-conviction review.",tip:"Jurors who conceal bias during voir dire, and racially discriminatory strikes, are both grounds for post-conviction relief. Know what to look for in your voir dire transcript.",dialogue:[
+{r:"judge",rl:"THE COURT",t:"Ladies and gentlemen, we will now conduct voir dire. You are required to answer all questions truthfully. Failure to disclose material information is juror misconduct and can result in the verdict being set aside."},
+{r:"prose",rl:"PROSECUTOR",t:"Juror 4 — have you or anyone in your family had any negative experience with law enforcement?"},
+{r:"wit",rl:"JUROR 4",t:"No."},
+{r:"def",rl:"DEFENSE COUNSEL",t:"[NOTE: If Juror 4 answered 'No' but actually had a relative convicted of a similar crime, or had filed a police complaint — that concealment is juror misconduct. McDonough Power Equipment v. Greenwood: concealment of material information during voir dire is grounds for new trial.]"},
+{r:"def",rl:"DEFENSE COUNSEL",t:"Juror 8 — can you judge this case solely on the evidence in this courtroom, setting aside anything you've heard in the community about this case?"},
+{r:"wit",rl:"JUROR 8",t:"I'll try my best."},
+{r:"def",rl:"DEFENSE COUNSEL",t:"Your Honor, I move to strike Juror 8 for cause. 'I'll try' is not an unequivocal commitment to impartiality. Irvin v. Dowd (1961) requires actual impartiality, not an attempt at it."}
+]}
+};
+
+// ═══════════════════════════════
+// BUILD DOCTRINES
+// ═══════════════════════════════
+function buildDocs(){
+  const g=document.getElementById('doc-grid');
+  DOCTRINES.forEach(d=>{
+    const el=document.createElement('div');
+    el.className='doc-card';
+    el.innerHTML=`<div class="dc-cite">${d.cite}</div><div class="dc-title">${d.title}</div><div class="dc-desc">${d.desc}</div><div class="dc-tip">${d.tip}</div>`;
+    g.appendChild(el);
+  });
+}
+
+// ═══════════════════════════════
+// BUILD TRANSCRIPTS
+// ═══════════════════════════════
+function buildTranscripts(){
+  Object.entries(TRANSCRIPTS).forEach(([id,tr])=>{
+    const p=document.getElementById(id);
+    if(!p)return;
+    p.innerHTML=`<div class="tr-wrap"><div class="tr-hdr"><div class="tr-htitle">${tr.title}</div><div class="tr-hmeta">${tr.meta}</div></div><div class="tr-body">${tr.content}</div></div>`;
+  });
+}
+function showT(btn,id){
+  document.querySelectorAll('.tnbtn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tpane').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(id)?.classList.add('on');
+}
+
+// ═══════════════════════════════
+// MOCK TRIAL
+// ═══════════════════════════════
+let mIdx=0,mCurrent=null;
+function runMock(){
+  const val=document.getElementById('mock-sel').value;
+  if(!val){alert('Please choose a scenario first.');return;}
+  const sc=MOCKS[val];if(!sc)return;
+  mCurrent=sc;mIdx=0;
+  document.getElementById('mock-stage-lbl').textContent=sc.stage;
+  document.getElementById('mock-scene').textContent=sc.scene;
+  document.getElementById('mock-dlg').innerHTML='';
+  document.getElementById('mock-tip').textContent=sc.tip;
+  playStep();
+}
+function playStep(){
+  if(!mCurrent)return;
+  const dlg=document.getElementById('mock-dlg');
+  if(mIdx>=mCurrent.dialogue.length){document.getElementById('mock-tip').textContent='Simulation complete. Study each exchange above. Click Reset to try another.';return;}
+  const m=mCurrent.dialogue[mIdx];
+  const d=document.createElement('div');
+  d.className=`mock-msg ${m.r}`;
+  d.innerHTML=`<div class="mock-role">${m.rl}</div>${m.t}`;
+  dlg.appendChild(d);dlg.scrollTop=dlg.scrollHeight;
+  mIdx++;
+  if(mIdx<mCurrent.dialogue.length)setTimeout(playStep,1500);
+  else document.getElementById('mock-tip').textContent='Complete. Click Reset to run another scenario.';
+}
+function resetMock(){
+  mIdx=0;mCurrent=null;
+  document.getElementById('mock-dlg').innerHTML='';
+  document.getElementById('mock-scene').textContent='Choose a hearing type and click Run Simulation. Each simulation walks you through the exact procedural sequence, step by step, with annotations explaining what each exchange means for your case.';
+  document.getElementById('mock-stage-lbl').textContent='Select a scenario below';
+  document.getElementById('mock-tip').textContent='Select a scenario to begin';
+}
+
+// ═══════════════════════════════
+// APP
+// ═══════════════════════════════
+let history=[];
+
+// Multi-method AI caller — tries 5 different ways to connect
+async function callClaudeFF(systemPrompt, messages){
+  const key = localStorage.getItem('ff_api_key') || '';
+  if(!key) return null;
+  const payload = {model:'claude-sonnet-4-20250514',max_tokens:1200,system:systemPrompt,messages};
+
+  // Method 1: Direct
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-allow-browser':'true'},
+      body:JSON.stringify(payload)});
+    if(r.ok){const d=await r.json();const t=d?.content?.[0]?.text;if(t)return t;}
+  }catch(e){}
+
+  // Method 2: Cloudflare worker
+  try{
+    const r2=await fetch('https://helpinghand.chrystalclyre.workers.dev',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({key,...payload})});
+    if(r2.ok){const d2=await r2.json();const t2=d2?.content?.[0]?.text;if(t2)return t2;}
+  }catch(e){}
+
+  // Method 3: thingproxy
+  try{
+    const r3=await fetch('https://thingproxy.freeboard.io/fetch/https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify(payload)});
+    if(r3.ok){const d3=await r3.json();const t3=d3?.content?.[0]?.text;if(t3)return t3;}
+  }catch(e){}
+
+  // Method 4: corsproxy.io
+  // Get system prompt from the existing code
+  const reply = await callClaudeFF(sys, history);
+  if(reply){
+    history.push({role:'assistant',content:reply});
+    td.querySelector('.abub').innerHTML=`<div class="ameta">FreedomFilings AI</div>${reply.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}`;
+  } else {
+    const k = getFFKey();
+    if(!k){
+      td.querySelector('.abub').innerHTML='Please tap the 🔑 API Key button and enter your Anthropic API key to activate the AI.';
+    } else {
+      td.querySelector('.abub').innerHTML='Connection issue. Please check your internet connection and API key, then try again.';
+    }
+  }
+}
+
+function gen(type){
+  const labels={
+    habeas:'Generate a complete federal § 2254 Habeas Corpus Petition based on all case information in this conversation. Format as a ready-to-file document with all constitutional claims, factual allegations, and prayer for relief.',
+    pcr:'Generate a complete state PCR Application based on all case information. Include every constitutional violation identified, factual basis, legal standards, and verification statement.',
+    brady:'Generate a complete Brady and FOIA Records Request Letter demanding disclosure of all suppressed evidence — police reports, lab results, officer notes, witness deals, informant files, dash cam footage, and all exculpatory or impeachment material.',
+    iac:'Generate a complete Strickland v. Washington Ineffective Assistance of Counsel analysis — both deficient performance and prejudice prongs — for every attorney failure identified. Include case citations and anticipate the strategic decision defense.',
+    boykin:'Generate a complete Motion to Withdraw Guilty Plea based on Boykin v. Alabama — analyzing the plea colloquy for every missing advisement, any coercion, and any attorney misrepresentation of the sentence or consequences.',
+    martinez:'Generate a complete Martinez v. Ryan Cause and Prejudice brief arguing that ineffective PCR counsel excuses procedural default of the underlying IAC claim in federal habeas.',
+    actual:'Generate a complete Actual Innocence Gateway brief under McQuiggin v. Perkins and Schlup v. Delo — presenting all new evidence and arguing that no reasonable juror would convict.',
+    batson:'Generate a complete Batson v. Kentucky analysis of racial discrimination in jury selection, including comparative juror analysis and identification of pretext in the prosecution\'s race-neutral explanations.',
+    competency:'Generate a complete Competency Claim under Dusky v. United States, Pate v. Robinson, and Drope v. Missouri — based on all mental health history described. Include argument that trial while incompetent requires automatic reversal.',
+    ramos:'Generate a complete non-unanimous jury claim under Ramos v. Louisiana, including whether it applies to this conviction and what state or federal court remedy is available.',
+    miller:'Generate a complete Miller v. Alabama / Montgomery v. Louisiana resentencing motion — arguing that the mandatory LWOP sentence imposed for a juvenile offense must be reconsidered with individualized sentencing.',
+    affidavit:'Generate complete Witness Affidavit templates for each witness identified in this conversation, formatted for notarization and ready for court filing.',
+    ifp:'Generate a complete In Forma Pauperis Application with required financial disclosure and prayer for waiver of all court fees and costs.',
+    'innocence-letter':'Generate complete application letters to: (1) SC Innocence Project, (2) national Innocence Project, (3) Equal Justice Initiative, and (4) ACLU — describing the case facts and requesting representation.',
+    timeline:'Generate a complete chronological timeline of every event in this case from the date of the alleged offense to today, with legal significance noted for each event.',
+    actionplan:'Generate a complete plain-language Deadline Action Plan — every filing needed in priority order, with specific deadlines, filing addresses, tolling arguments, and step-by-step instructions written so a non-lawyer can follow them.'
+  };
+  document.getElementById('app-ta').value=labels[type]||'';
+  appSend();
+}
+
+function handleUpload(input){
+  const files=Array.from(input.files);
+  files.forEach(f=>{addMsg('user',`<span style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:2px 9px;color:var(--gold2);">📎 ${f.name}</span>`);});
+  history.push({role:'user',content:`Documents uploaded: ${files.map(f=>f.name).join(', ')}. Please analyze for all constitutional violations and legal issues applicable to this case.`});
+  const td=addMsg('ai','<div class="tdots"><div class="td"></div><div class="td"></div><div class="td"></div></div>');
+  setTimeout(async()=>{
+    try{
+      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are FreedomFilings AI. Documents were just uploaded. Acknowledge the upload, tell the user you are ready to analyze them, and ask them to paste the text content of each document directly into the chat so you can read and analyze every legally significant detail. Be specific about what you are looking for.',messages:history})});
+      const data=await resp.json();
+      const reply=data.content?.[0]?.text||'Documents received. Please paste the text content below for analysis.';
+      history.push({role:'assistant',content:reply});
+      td.querySelector('.abub').innerHTML=`<div class="ameta">FreedomFilings AI — Document Analysis</div>${reply.replace(/\n/g,'<br>')}`;
+    }catch(e){td.querySelector('.abub').innerHTML='Documents received. Please paste the text content below and I will analyze it for every constitutional violation.';}
+  },100);
+  input.value='';
+}
+
+// MODALS / NAV
+function openM(id){document.getElementById(id).classList.add('on');}
+function closeM(id){document.getElementById(id).classList.remove('on');}
+document.addEventListener('click',e=>{if(e.target.classList.contains('modal-bg'))e.target.classList.remove('on');});
+function navTo(btn,id){document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');document.getElementById(id)?.scrollIntoView({behavior:'smooth'});}
+function scrollTo(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'});}
+
+// POPULATE STATE SELECT
+const STATES50=['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
+function populateStates(){
+  const sel=document.getElementById('modal-state');
+  if(!sel)return;
+  STATES50.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
+}
+
+// INIT
+document.addEventListener('DOMContentLoaded',()=>{
+  buildDocs();
+  buildTranscripts();
+  populateStates();
+});
+</script>
+</body>
+</html>
